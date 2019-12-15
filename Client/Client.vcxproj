@@ -23,32 +23,32 @@
     <ProjectGuid>{F7A4767D-E453-4449-97BD-914EDEBCB5E8}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Client</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -147,6 +147,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\PBFramework\PBAnimation.cpp" />
+    <ClCompile Include="..\PBFramework\PBApplication.cpp" />
+    <ClCompile Include="..\PBFramework\PBDeviceContext.cpp" />
+    <ClCompile Include="..\PBFramework\PBPoint.cpp" />
+    <ClCompile Include="..\PBFramework\PBRect.cpp" />
+    <ClCompile Include="..\PBFramework\PBScene.cpp" />
+    <ClCompile Include="..\PBFramework\PBSocket.cpp" />
+    <ClCompile Include="..\PBFramework\PBSound.cpp" />
+    <ClCompile Include="..\PBFramework\PBSprite.cpp" />
+    <ClCompile Include="..\PBFramework\PBThread.cpp" />
+    <ClCompile Include="..\PBFramework\PBWindow.cpp" />
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Base.cpp" />
     <ClCompile Include="Bubble.cpp" />

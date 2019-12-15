@@ -34,6 +34,9 @@
     <Filter Include="Header Files">
       <UniqueIdentifier>{80cbbc93-a9ea-44eb-b41c-201a97701620}</UniqueIdentifier>
     </Filter>
+    <Filter Include="PBFramework">
+      <UniqueIdentifier>{c6c8d214-8401-47d9-bf85-cd94ef9ac0d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -65,6 +68,39 @@
     </ClCompile>
     <ClCompile Include="Object.cpp">
       <Filter>Source Files\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PBFramework\PBAnimation.cpp">
+      <Filter>PBFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PBFramework\PBApplication.cpp">
+      <Filter>PBFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PBFramework\PBDeviceContext.cpp">
+      <Filter>PBFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PBFramework\PBPoint.cpp">
+      <Filter>PBFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PBFramework\PBRect.cpp">
+      <Filter>PBFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PBFramework\PBScene.cpp">
+      <Filter>PBFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PBFramework\PBSocket.cpp">
+      <Filter>PBFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PBFramework\PBSound.cpp">
+      <Filter>PBFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PBFramework\PBSprite.cpp">
+      <Filter>PBFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PBFramework\PBThread.cpp">
+      <Filter>PBFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\PBFramework\PBWindow.cpp">
+      <Filter>PBFramework</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -219,10 +219,12 @@ bool App::onReceive(tcp & sock)
 
         // 현재 scene의 onReceive를 호출하면서 파싱된 json 객체를 넘겨준다.
         scene->onReceive(sock, root);
+		return true;
     }
     catch(std::exception& e)
     {
         //MessageBoxA(NULL, e.what(), "", MB_OK);
+		return false;
     }
 }
 

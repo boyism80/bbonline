@@ -3,10 +3,10 @@
 
 #ifdef _WIN64
 #pragma comment(lib, "json/x64/json_vc71_libmtd.lib")
-#pragma comment(lib, "PBFramework/lib/x64/PBFramework.lib")
+//#pragma comment(lib, "PBFramework/lib/x64/PBFramework.lib")
 #else
 #pragma comment(lib, "json/x86/json_vc71_libmtd.lib")
-#pragma comment(lib, "PBFramework/lib/x86/PBFramework.lib")
+//#pragma comment(lib, "PBFramework/lib/x86/PBFramework.lib")
 #endif // _WIN64
 
 #include "json/json.h"
