@@ -160,12 +160,14 @@
     <ClCompile Include="PBSocket.cpp" />
     <ClCompile Include="PBSound.cpp" />
     <ClCompile Include="PBSprite.cpp" />
+    <ClCompile Include="PBStream.cpp" />
     <ClCompile Include="PBThread.cpp" />
     <ClCompile Include="PBWindow.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="PBAnimation.h" />
     <ClInclude Include="PBApplication.h" />
+    <ClInclude Include="PBStream.h" />
     <ClInclude Include="PBDeviceContext.h" />
     <ClInclude Include="PBLeak.h" />
     <ClInclude Include="PBObject.h" />

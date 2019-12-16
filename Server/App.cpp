@@ -91,7 +91,7 @@ bool App::addEvent(const std::string & method, BBPacketRoutine callbackRoutine)
 // Return
 //  없음
 //
-void App::methodEventProc(Client* client, Json::Value& json)
+void App::methodEventProc(Client* client, Json::Value& json, uint8_t* binary, uint32_t binary_size)
 {
     std::string             method  = json["method"].asString();        // method 필드
 
@@ -111,7 +111,6 @@ void App::methodEventProc(Client* client, Json::Value& json)
 
         // 현재 클라이언트의 방 번호를 먼저 구한다.
         Room*               room        = client->room();
-        //int                   roomidx     = client->currentRoom();
 
 
         // method에 대응되는 루틴을 실행
@@ -1399,14 +1398,83 @@ void App::onDisconnected(tcp& socket)
 bool App::onReceive(tcp& socket)
 {
     Client*                 client  = (Client*)&socket;
-    Json::Value             root;
+	bool					success = true;
+	uint8_t*				buffer  = NULL;
+	uint8_t*				binary  = NULL;
 
-    if(client->recv(root) == false)
-        return false;
+//    if(client->recv(root) == false)
+//        return false;
+//
+//csection::enter("clients");
+//    this->methodEventProc(client, root);
+//csection::leave("clients");
 
-csection::enter("clients");
-    this->methodEventProc(client, root);
-csection::leave("clients");
+	// 데이터를 읽어들임
+	if(client->recv() == false)
+		return false;
 
-    return true;
+	// 누적된 데이터 파싱
+	istream&			istream   = client->in_stream();
+	while(true)
+	{
+		try
+		{
+			if(istream.readable_size() < sizeof(uint32_t))
+				break;
+			
+			uint32_t size = istream.read_u32();
+			if(size > istream.capacity())
+				throw std::exception();
+
+			if(istream.readable_size() < size)
+				break;
+
+			if(buffer != NULL)
+				delete[] buffer;
+
+			buffer = new uint8_t[size];
+			istream.read(buffer, size);
+
+			Json::Value root;
+			Json::Reader reader;
+			std::string jsons(buffer, buffer + size);
+			if(reader.parse(jsons, root) == false)
+				throw std::exception();
+
+			if(root.isMember("method") == false)
+				throw std::exception();
+			std::string method = root["method"].asString();
+
+
+			if(root.isMember("binary size"))
+			{
+				uint32_t binary_size = root["binary size"].asInt();
+				if(istream.readable_size() < binary_size)
+					break;
+
+				if(binary != NULL)
+					delete[] binary;
+				binary = new uint8_t[binary_size];
+				istream.read(binary, binary_size);
+			}
+
+			this->methodEventProc(client, root, binary);
+		}
+		catch(std::exception& e)
+		{
+			success = false;
+			break;
+		}
+	}
+
+	// 참조한 오프셋을 원래대로 돌린다.
+	istream.reset();
+
+	if(buffer != NULL)
+		delete[] buffer;
+
+	if(binary != NULL)
+		delete[] binary;
+
+    return success;
 }

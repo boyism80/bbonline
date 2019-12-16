@@ -428,11 +428,11 @@ csection::enter("windows");
         if(window == NULL)
             continue;
 
-        dc_buffer buffer(dc, window->_area, window->backgroundColor());
-        window->onFrameRender(buffer, elapsedTime);
-        window->onGUIRender(buffer, elapsedTime);
+        dc_buffer stream(dc, window->_area, window->backgroundColor());
+        window->onFrameRender(stream, elapsedTime);
+        window->onGUIRender(stream, elapsedTime);
         
-        dc.update(buffer);
+        dc.update(stream);
     }
 csection::leave("windows");
 }
@@ -764,10 +764,10 @@ bool PB::Windows::Control::textbox::onCharacter(wchar_t key, bool isDown)
     }
     else
     {
-        char buffer[3] = { 0, };
-        wcstombs(buffer, &key, sizeof(buffer));
+        char stream[3] = { 0, };
+        wcstombs(stream, &key, sizeof(stream));
 
-        this->text(this->text() + buffer);
+        this->text(this->text() + stream);
 
         parameters["text"] = this->text();
         parameters["back"] = false;

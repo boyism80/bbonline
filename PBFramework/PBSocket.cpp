@@ -5,14 +5,18 @@ WSAData socket::_wsa;
 
 socket::socket(int af, int type, int protocol)
 {
-    this->_socket           = ::socket(af, type, protocol);
-    if (this->_socket == INVALID_SOCKET)
+    this->_fd           = ::socket(af, type, protocol);
+    if (this->_fd == INVALID_SOCKET)
         throw std::exception("socket error");
+
+	// non blocking 소켓
+	u_long opt = 1;
+	::ioctlsocket(this->_fd, FIONBIO, &opt);
 }
 
 socket::socket(SOCKET sock)
 {
-    this->_socket           = sock;
+    this->_fd           = sock;
 }
 
 socket::~socket()
@@ -36,7 +40,7 @@ bool socket::bind(short port)
     addr.sin_port                   = htons(port);
     addr.sin_addr.s_addr            = INADDR_ANY;
 
-    return ::bind(this->_socket, (struct sockaddr*)&addr, sizeof(addr)) != SOCKET_ERROR;
+    return ::bind(this->_fd, (struct sockaddr*)&addr, sizeof(addr)) != SOCKET_ERROR;
 }
 
 //
@@ -51,14 +55,14 @@ bool socket::bind(short port)
 // 
 void socket::close()
 {
-    closesocket(this->_socket);
+    closesocket(this->_fd);
 }
 
 bool PB::socket::peername(std::string * ip, int * port) const
 {
     struct sockaddr_in      addr = {0,};
     int                     size = sizeof(addr);
-    if(::getpeername(this->_socket, (struct sockaddr *)&addr, &size) == SOCKET_ERROR)
+    if(::getpeername(this->_fd, (struct sockaddr *)&addr, &size) == SOCKET_ERROR)
         return false;
 
     if(port != NULL)
@@ -82,7 +86,7 @@ const std::string PB::socket::toString() const
 
 socket::operator SOCKET() const
 {
-    return this->_socket;
+    return this->_fd;
 }
 
 PB::socket::operator const std::string() const
@@ -122,6 +126,8 @@ void socket::release()
 
 tcp::tcp() : socket(AF_INET, SOCK_STREAM, 0)
 {
+	this->_istream.reserve(0x1000);
+	this->_ostream.reserve(0x1000);
 }
 
 tcp::tcp(SOCKET sock) : socket(sock)
@@ -144,7 +150,7 @@ tcp::~tcp()
 //
 bool tcp::listen()
 {
-    return ::listen(this->_socket, SOMAXCONN) != SOCKET_ERROR;
+    return ::listen(this->_fd, SOMAXCONN) != SOCKET_ERROR;
 }
 
 //
@@ -161,7 +167,7 @@ tcp tcp::accept()
 {
     struct sockaddr_in  addr        = {0,};
     int                 addrsize    = sizeof(addr);
-    SOCKET              client      = ::accept(this->_socket, (struct sockaddr*)&addr, &addrsize);
+    SOCKET              client      = ::accept(this->_fd, (struct sockaddr*)&addr, &addrsize);
 
     if (client == SOCKET_ERROR)
         throw std::exception("accept error");
@@ -196,7 +202,7 @@ bool tcp::connect(const std::string& ip, short port)
         addr.sin_addr.s_addr = *((unsigned long *)(entry->h_addr_list[0]));
     }
 
-    return ::connect(this->_socket, (struct sockaddr*)&addr, sizeof(addr)) != SOCKET_ERROR;
+    return ::connect(this->_fd, (struct sockaddr*)&addr, sizeof(addr)) != SOCKET_ERROR;
 }
 
 //
@@ -209,13 +215,25 @@ bool tcp::connect(const std::string& ip, short port)
 // Return
 //  성공시 true, 실패시 false
 //
-bool tcp::send(const std::vector<char>& bytes)
+bool tcp::send()
 {
-    int                 result      = ::send(this->_socket, bytes.data(), bytes.size(), 0);
-    if (result == SOCKET_ERROR)
-        return false;
+	if(this->_fd == INVALID_SOCKET)
+		return false;
 
-    return true;
+	if(this->_ostream.size() == 0)
+		return true;
+
+	uint32_t				sent_size = ::send(this->_fd, (const char*)this->_ostream.data(), this->_ostream.size(), 0);
+	if(sent_size == SOCKET_ERROR && WSAGetLastError() == WSAEWOULDBLOCK)
+		return false;
+
+	if(sent_size == 0)
+		return false;
+
+	if(sent_size != SOCKET_ERROR)
+		this->_ostream.erase(this->_ostream.begin(), this->_ostream.begin() + sent_size);
+
+	return true;
 }
 
 //
@@ -229,27 +247,50 @@ bool tcp::send(const std::vector<char>& bytes)
 // Return
 //  성공시 true, 실패시 false
 //
-bool tcp::recv(std::vector<char>& buffer, int size)
+bool tcp::recv()
 {
-    char                temp[256]   = {0,};
-    int                 recvsize    = 0;
-    int                 amount      = 0;
+	if(this->_fd == INVALID_SOCKET)
+		return false;
 
-    buffer.clear();
-    while(size > amount)
-    {
-        recvsize        = ::recv(this->_socket, temp, min(sizeof(temp), size - amount), 0);
-        if(recvsize == SOCKET_ERROR)
-            return false;
+	uint32_t				space		= this->_istream.capacity() - this->_istream.size();
+	if(space == 0)
+		return false;
 
-        if(recvsize == 0)
-            return false;
+	char*					buffer		= new char[space];
+	bool					success		= true;
 
-        buffer.insert(buffer.end(), temp, temp + recvsize);
-        amount          += recvsize;
-    }
-    
-    return true;
+	try
+	{
+		uint32_t			recv_size	= ::recv(this->_fd, buffer, space, 0);
+		if(recv_size == SOCKET_ERROR && WSAGetLastError() != WSAEWOULDBLOCK)
+			throw std::exception();
+
+		if(recv_size == 0)
+			throw std::exception();
+
+		this->_istream.insert(this->_istream.end(), buffer, buffer + recv_size);
+
+		delete[] buffer;
+		return true;
+	}
+	catch(std::exception&)
+	{
+		delete[] buffer;
+		return false;
+	}
+
+	delete[] buffer;
+	return success;
+}
+
+istream& PB::tcp::in_stream()
+{
+	return this->_istream;
+}
+
+ostream& PB::tcp::out_stream()
+{
+	return this->_ostream;
 }
 
 udp::udp() : socket(AF_INET, SOCK_DGRAM, 0)
@@ -267,25 +308,25 @@ bool udp::sendto(const std::string & ip, short port, const std::vector<char>& by
     addr.sin_addr.s_addr                = inet_addr(ip.c_str());
     addr.sin_port                       = htons(port);
 
-    int                 sendsize        = ::sendto(this->_socket, bytes.data(), bytes.size(), 0, (struct sockaddr*)&addr, sizeof(addr));
+    int                 sendsize        = ::sendto(this->_fd, bytes.data(), bytes.size(), 0, (struct sockaddr*)&addr, sizeof(addr));
     if(sendsize == SOCKET_ERROR)
         return false;
 
     return true;
 }
 
-bool udp::recvfrom(std::string & ip, short * port, std::vector<char>& buffer) throw(std::exception)
+bool udp::recvfrom(std::string & ip, short * port, std::vector<char>& stream) throw(std::exception)
 {
     struct sockaddr_in  addr            = {0,};
     int                 addrsize        = sizeof(addr);
 
-    buffer.resize(4096);
-    buffer.clear();
-    int                 recvsize        = ::recvfrom(this->_socket, buffer.data(), buffer.size(), 0, (struct sockaddr*)&addr, &addrsize);
+    stream.resize(4096);
+    stream.clear();
+    int                 recvsize        = ::recvfrom(this->_fd, stream.data(), stream.size(), 0, (struct sockaddr*)&addr, &addrsize);
     if(recvsize == SOCKET_ERROR)
         return false;
 
-    buffer.resize(recvsize);
+    stream.resize(recvsize);
     return true;
 }
 

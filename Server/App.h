@@ -45,7 +45,7 @@ private:
 private:
     bool                    loadMaps(const std::string& path);
     bool                    addEvent(const std::string& method, BBPacketRoutine callbackRoutine);
-    void                    methodEventProc(Client* client, Json::Value& json);
+    void                    methodEventProc(Client* client, Json::Value& json, uint8_t* binary, uint32_t binary_size);
 
 public:
     void                    destroyRoom(Room* room);

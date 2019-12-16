@@ -11,6 +11,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include "PBStream.h"
 
 namespace PB {
 
@@ -20,7 +21,7 @@ namespace PB {
         static WSAData          _wsa;
 
     protected:
-        SOCKET                  _socket;
+        SOCKET                  _fd;
 
     protected:
         socket(int af, int type, int protocol)                  throw (std::exception);
@@ -46,6 +47,10 @@ namespace PB {
 
     class __declspec(dllexport) tcp : public socket
     {
+	private:
+		istream					_istream;
+		ostream					_ostream;
+
     public:
         tcp();
         tcp(SOCKET sock);
@@ -56,8 +61,12 @@ namespace PB {
         tcp                     accept();
         bool                    connect(const std::string& ip, short port);
 
-        bool                    send(const std::vector<char>& data);
-        bool                    recv(std::vector<char>& buffer, int size);
+        bool                    send();
+        bool                    recv();
+
+	public:
+		istream&				in_stream();
+		ostream&				out_stream();
     };
 
     class __declspec(dllexport) udp : public socket
@@ -67,7 +76,7 @@ namespace PB {
         virtual ~udp();
 
         bool                    sendto(const std::string& ip, short port, const std::vector<char>& bytes);
-        bool                    recvfrom(std::string& ip, short* port, std::vector<char>& buffer);
+        bool                    recvfrom(std::string& ip, short* port, std::vector<char>& stream);
     };
 
     class __declspec(dllexport) socket_map : private std::map<SOCKET, tcp*>

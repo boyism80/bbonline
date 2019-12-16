@@ -241,11 +241,11 @@ UINT application::messageLoop()
             this->_currentScene->onFrameMove(elapsedTime);
 
             dc              dc(this->_hwnd, this->_scale);
-            dc_buffer       buffer(dc, this->_currentScene->area());
+            dc_buffer       stream(dc, this->_currentScene->area());
             
-            this->_currentScene->onFrameRender(buffer, elapsedTime);
-            this->_currentScene->onGUIRender(buffer,elapsedTime);
-            dc.update(buffer);
+            this->_currentScene->onFrameRender(stream, elapsedTime);
+            this->_currentScene->onGUIRender(stream,elapsedTime);
+            dc.update(stream);
             
             int             useTime = ::GetTickCount() - begin;
             if(useTime < duration)

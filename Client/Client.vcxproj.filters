@@ -126,6 +126,9 @@
     <ClCompile Include="..\PBFramework\PBAnimation.cpp">
       <Filter>PBFramework</Filter>
     </ClCompile>
+    <ClCompile Include="..\PBFramework\PBStream.cpp">
+      <Filter>PBFramework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">

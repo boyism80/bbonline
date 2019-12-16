@@ -156,6 +156,7 @@
     <ClCompile Include="..\PBFramework\PBSocket.cpp" />
     <ClCompile Include="..\PBFramework\PBSound.cpp" />
     <ClCompile Include="..\PBFramework\PBSprite.cpp" />
+    <ClCompile Include="..\PBFramework\PBStream.cpp" />
     <ClCompile Include="..\PBFramework\PBThread.cpp" />
     <ClCompile Include="..\PBFramework\PBWindow.cpp" />
     <ClCompile Include="App.cpp" />

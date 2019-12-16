@@ -102,6 +102,9 @@
     <ClCompile Include="..\PBFramework\PBWindow.cpp">
       <Filter>PBFramework</Filter>
     </ClCompile>
+    <ClCompile Include="..\PBFramework\PBStream.cpp">
+      <Filter>PBFramework</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bubble.h">
