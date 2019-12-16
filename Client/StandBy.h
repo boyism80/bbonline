@@ -13,7 +13,7 @@ using namespace PB::Windows;
 
 namespace Scene {
 
-class StandBy : public Base
+class StandBy : public BaseScene
 {
 private:
     Json::Value         _userList;

@@ -120,24 +120,24 @@ void App::methodEventProc(Client* client, Json::Value& json, uint8_t* binary, ui
 
         // 응답할 대상의 범위에 맞게 응답해준다.
 csection::enter("room");
-        switch(scope)
-        {
-        case SendScope::ALL:
-            this->sendAll(response);
-            break;
+        //switch(scope)
+        //{
+        //case SendScope::ALL:
+        //    this->sendAll(response);
+        //    break;
 
-        case SendScope::ROOM:
-            this->sendRoom(client->room() != NULL ? client->room() : room, response);
-            break;
+        //case SendScope::ROOM:
+        //    this->sendRoom(client->room() != NULL ? client->room() : room, response);
+        //    break;
 
-        case SendScope::ROBBY:
-            this->sendRobby(response);
-            break;
+        //case SendScope::ROBBY:
+        //    this->sendRobby(response);
+        //    break;
 
-        case SendScope::SELF:
-            client->send(response);
-            break;
-        }
+        //case SendScope::SELF:
+        //    client->send(response);
+        //    break;
+        //}
 
 csection::leave("room");
     }
@@ -148,7 +148,7 @@ csection::leave("room");
         json["error"]       = e.what();
         json["success"]     = false;
 
-        client->send(json);
+        //client->send(json);
 csection::leave("room");
     }
 }
@@ -1397,24 +1397,18 @@ void App::onDisconnected(tcp& socket)
 
 bool App::onReceive(tcp& socket)
 {
-    Client*                 client  = (Client*)&socket;
+    //Client*                 client  = (Client*)&socket;
 	bool					success = true;
 	uint8_t*				buffer  = NULL;
 	uint8_t*				binary  = NULL;
-
-//    if(client->recv(root) == false)
-//        return false;
-//
-//csection::enter("clients");
-//    this->methodEventProc(client, root);
-//csection::leave("clients");
+	uint32_t				binary_size = 0;
 
 	// 데이터를 읽어들임
-	if(client->recv() == false)
+	if(socket.recv() == false)
 		return false;
 
 	// 누적된 데이터 파싱
-	istream&			istream   = client->in_stream();
+	istream&			istream   = socket.in_stream();
 	while(true)
 	{
 		try
@@ -1446,9 +1440,10 @@ bool App::onReceive(tcp& socket)
 			std::string method = root["method"].asString();
 
 
+			binary_size = 0;
 			if(root.isMember("binary size"))
 			{
-				uint32_t binary_size = root["binary size"].asInt();
+				binary_size = root["binary size"].asInt();
 				if(istream.readable_size() < binary_size)
 					break;
 
@@ -1458,7 +1453,7 @@ bool App::onReceive(tcp& socket)
 				istream.read(binary, binary_size);
 			}
 
-			this->methodEventProc(client, root, binary);
+			this->methodEventProc((Client*)&socket, root, binary, binary_size);
 		}
 		catch(std::exception& e)
 		{

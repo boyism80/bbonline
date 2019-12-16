@@ -37,7 +37,7 @@ public:
     bool                    leave();
 
 public:
-    //bool                    send(const Json::Value& json);
+    bool                    send(const Json::Value& json);
     //bool                    recv(Json::Value& json);
 
 public:

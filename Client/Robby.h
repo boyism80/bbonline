@@ -12,7 +12,7 @@ using namespace PB::Windows;
 
 namespace Scene {
 
-class Robby : public Base
+class Robby : public BaseScene
 {
 private:
     int                 _x, _y;

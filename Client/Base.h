@@ -11,10 +11,10 @@ using namespace PB::Windows;
 
 namespace Scene {
 
-class Base : public scene
+class BaseScene : public scene
 {
 public:
-    typedef bool (Base::*BBPacketRoutine)(tcp&, Json::Value&, const Json::Value&);
+    typedef bool (BaseScene::*BBPacketRoutine)(tcp&, Json::Value&, const Json::Value&);
 
 private:
     std::unordered_map<std::string, BBPacketRoutine>        _eventTable;
@@ -23,9 +23,9 @@ protected:
     sound                   _sound;
 
 public:
-    Base(PB::Windows::sprite* sprite, PB::Windows::sprite* backgroundSprite, const std::string& backgroundName, int width = GAME_SCREEN_WIDTH, int height = GAME_SCREEN_HEIGHT);
-    Base(const std::string& filename, PB::Windows::sprite* sprite, PB::Windows::sprite* backgroundSprite, const std::string& backgroundName);
-    virtual ~Base();
+    BaseScene(PB::Windows::sprite* sprite, PB::Windows::sprite* backgroundSprite, const std::string& backgroundName, int width = GAME_SCREEN_WIDTH, int height = GAME_SCREEN_HEIGHT);
+    BaseScene(const std::string& filename, PB::Windows::sprite* sprite, PB::Windows::sprite* backgroundSprite, const std::string& backgroundName);
+    virtual ~BaseScene();
 
 public:
     bool                    addEvent(const std::string& method, BBPacketRoutine callbackRoutine);

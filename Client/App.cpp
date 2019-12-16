@@ -151,7 +151,7 @@ void App::onDestroy()
 
     Json::Value     json;
     json["method"]          = "disconnect";
-    this->send(Scene::Base::encodeJson(json));
+    this->send(Scene::BaseScene::encodeJson(json));
 
     this->close();
 
@@ -174,7 +174,7 @@ void App::onConnected(tcp & sock)
     root["method"]          = "connect";
     root["success"]         = true;
 
-    sock.send(Scene::Base::encodeJson(root));
+    sock.send(Scene::BaseScene::encodeJson(root));
 }
 
 //
@@ -201,7 +201,7 @@ bool App::onReceive(tcp & sock)
         if(this->recv(buffer, size) == false)
             return false;
 
-        if(Scene::Base::decodeJson(buffer, root) == false)
+        if(Scene::BaseScene::decodeJson(buffer, root) == false)
             return false;
 
         std::string             method = root["method"].asString();
@@ -212,7 +212,7 @@ bool App::onReceive(tcp & sock)
         }
 
         // 현재 씬을 얻는다.
-        Scene::Base*        scene = (Scene::Base*)this->currentScene();
+        Scene::BaseScene*        scene = (Scene::BaseScene*)this->currentScene();
         if (scene == NULL)
             return true;
 

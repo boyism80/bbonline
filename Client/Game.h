@@ -14,7 +14,7 @@ using namespace PB::Windows;
 
 namespace Scene {
 
-class Game : public Base
+class Game : public BaseScene
 {
 public:
     typedef std::unordered_map<int, Character*> CharacterDictionary;

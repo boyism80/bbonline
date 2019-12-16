@@ -2,15 +2,15 @@
 
 using namespace Scene;
 
-Scene::Base::Base(PB::Windows::sprite * sprite, PB::Windows::sprite* backgroundSprite, const std::string& backgroundName, int width, int height) : scene(sprite, width, height, backgroundSprite, backgroundName)
+Scene::BaseScene::BaseScene(PB::Windows::sprite * sprite, PB::Windows::sprite* backgroundSprite, const std::string& backgroundName, int width, int height) : scene(sprite, width, height, backgroundSprite, backgroundName)
 {
 }
 
-Scene::Base::Base(const std::string & filename, PB::Windows::sprite * sprite, PB::Windows::sprite* backgroundSprite, const std::string& backgroundName) : scene(filename, sprite, backgroundSprite, backgroundName)
+Scene::BaseScene::BaseScene(const std::string & filename, PB::Windows::sprite * sprite, PB::Windows::sprite* backgroundSprite, const std::string& backgroundName) : scene(filename, sprite, backgroundSprite, backgroundName)
 {
 }
 
-Scene::Base::~Base()
+Scene::BaseScene::~BaseScene()
 {
 }
 
@@ -25,7 +25,7 @@ Scene::Base::~Base()
 // Return
 //  성공시 true, 실패시 false(현재는 항상 true)
 //
-bool Base::addEvent(const std::string & method, BBPacketRoutine callbackRoutine)
+bool BaseScene::addEvent(const std::string & method, BBPacketRoutine callbackRoutine)
 {
     this->_eventTable.insert(std::make_pair(method, callbackRoutine));
     return true;
@@ -43,7 +43,7 @@ bool Base::addEvent(const std::string & method, BBPacketRoutine callbackRoutine)
 // Return
 //  없음
 //
-void Base::onReceive(tcp & socket, Json::Value & response)
+void BaseScene::onReceive(tcp & socket, Json::Value & response)
 {
     std::string             method      = response["method"].asString();
     Json::Value             request;
@@ -74,12 +74,12 @@ void Base::onReceive(tcp & socket, Json::Value & response)
     }
 }
 
-void Base::onDestroy()
+void BaseScene::onDestroy()
 {
     this->_sound.stop();
 }
 
-std::vector<char> Base::encodeJson(const Json::Value & json)
+std::vector<char> BaseScene::encodeJson(const Json::Value & json)
 {
     
     std::string         str = json.toStyledString();
@@ -92,7 +92,7 @@ std::vector<char> Base::encodeJson(const Json::Value & json)
     return buffer;
 }
 
-bool Base::decodeJson(const std::vector<char>& bytes, Json::Value& json)
+bool BaseScene::decodeJson(const std::vector<char>& bytes, Json::Value& json)
 {
     std::string     str(bytes.begin(), bytes.end());
     Json::Reader    reader;

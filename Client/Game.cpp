@@ -3,7 +3,7 @@
 
 using namespace Scene;
 
-Game::Game(const std::string& filename, PB::Windows::sprite* sprite, PB::Windows::sprite* backgroundSprite) : Base(filename, sprite, backgroundSprite, ""),
+Game::Game(const std::string& filename, PB::Windows::sprite* sprite, PB::Windows::sprite* backgroundSprite) : BaseScene(filename, sprite, backgroundSprite, ""),
 _characterSprite(L"Resources/sprite/character.pbs"),
 _enemySprite(L"Resources/sprite/enemy.pbs"),
 _mapSprite(L"Resources/sprite/map tiles.pbs"),
@@ -11,23 +11,23 @@ _map(NULL)
 {
     this->_level = -1;
 
-    this->addEvent("leave room", (Base::BBPacketRoutine)&Game::leaveRoomRoutine);
-    this->addEvent("map", (Base::BBPacketRoutine)&Game::mapRoutine);
-    this->addEvent("generate", (Base::BBPacketRoutine)&Game::generateRoutine);
-    this->addEvent("update", (Base::BBPacketRoutine)&Game::updateRoutine);
-    this->addEvent("stop", (Base::BBPacketRoutine)&Game::stopRoutine);
-    this->addEvent("shot bubble", (Base::BBPacketRoutine)&Game::shotBubbleRoutine);
-    this->addEvent("clear stage", (Base::BBPacketRoutine)&Game::clearStageRoutine);
-    this->addEvent("clear game", (Base::BBPacketRoutine)&Game::clearGameRoutine);
-    this->addEvent("lose game", (Base::BBPacketRoutine)&Game::loseGameRoutine);
-    this->addEvent("disconnected", (Base::BBPacketRoutine)&Game::disconnectedRoutine);
+    this->addEvent("leave room", (BaseScene::BBPacketRoutine)&Game::leaveRoomRoutine);
+    this->addEvent("map", (BaseScene::BBPacketRoutine)&Game::mapRoutine);
+    this->addEvent("generate", (BaseScene::BBPacketRoutine)&Game::generateRoutine);
+    this->addEvent("update", (BaseScene::BBPacketRoutine)&Game::updateRoutine);
+    this->addEvent("stop", (BaseScene::BBPacketRoutine)&Game::stopRoutine);
+    this->addEvent("shot bubble", (BaseScene::BBPacketRoutine)&Game::shotBubbleRoutine);
+    this->addEvent("clear stage", (BaseScene::BBPacketRoutine)&Game::clearStageRoutine);
+    this->addEvent("clear game", (BaseScene::BBPacketRoutine)&Game::clearGameRoutine);
+    this->addEvent("lose game", (BaseScene::BBPacketRoutine)&Game::loseGameRoutine);
+    this->addEvent("disconnected", (BaseScene::BBPacketRoutine)&Game::disconnectedRoutine);
 
-    this->addEvent("move", (Base::BBPacketRoutine)&Game::moveRoutine);
-    this->addEvent("jump", (Base::BBPacketRoutine)&Game::jumpRoutine);
-    this->addEvent("alive", (Base::BBPacketRoutine)&Game::aliveRoutine);
-    this->addEvent("shoot", (Base::BBPacketRoutine)&Game::shootRoutine);
-    this->addEvent("respawn", (Base::BBPacketRoutine)&Game::respawnRoutine);
-    this->addEvent("prison", (Base::BBPacketRoutine)&Game::prisonRoutine);
+    this->addEvent("move", (BaseScene::BBPacketRoutine)&Game::moveRoutine);
+    this->addEvent("jump", (BaseScene::BBPacketRoutine)&Game::jumpRoutine);
+    this->addEvent("alive", (BaseScene::BBPacketRoutine)&Game::aliveRoutine);
+    this->addEvent("shoot", (BaseScene::BBPacketRoutine)&Game::shootRoutine);
+    this->addEvent("respawn", (BaseScene::BBPacketRoutine)&Game::respawnRoutine);
+    this->addEvent("prison", (BaseScene::BBPacketRoutine)&Game::prisonRoutine);
 }
 
 Game::~Game()

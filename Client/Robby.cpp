@@ -3,7 +3,7 @@
 
 using namespace Scene;
 
-Scene::Robby::Robby(const std::string& filename, PB::Windows::sprite * sprite, PB::Windows::sprite* backgroundSprite, const std::string& backgroundName) : Base(filename, sprite, backgroundSprite, backgroundName), 
+Scene::Robby::Robby(const std::string& filename, PB::Windows::sprite * sprite, PB::Windows::sprite* backgroundSprite, const std::string& backgroundName) : BaseScene(filename, sprite, backgroundSprite, backgroundName), 
     _characterSprite(L"Resources/sprite/character.pbs"), _rooms(Json::arrayValue)
 {
     this->_x            = 100;
@@ -43,10 +43,10 @@ void Robby::onCreate()
     __super::onCreate();
     App::instance()->scale(1.0f);
 
-    this->addEvent("room list",     static_cast<Base::BBPacketRoutine>(&Robby::roomListRoutine));
-    this->addEvent("create room",   static_cast<Base::BBPacketRoutine>(&Robby::createRoomRoutine));
-    this->addEvent("leave room",    static_cast<Base::BBPacketRoutine>(&Robby::leaveRoomRoutine));
-    this->addEvent("enter room",    static_cast<Base::BBPacketRoutine>(&Robby::enterRoomRoutine));
+    this->addEvent("room list",     static_cast<BaseScene::BBPacketRoutine>(&Robby::roomListRoutine));
+    this->addEvent("create room",   static_cast<BaseScene::BBPacketRoutine>(&Robby::createRoomRoutine));
+    this->addEvent("leave room",    static_cast<BaseScene::BBPacketRoutine>(&Robby::leaveRoomRoutine));
+    this->addEvent("enter room",    static_cast<BaseScene::BBPacketRoutine>(&Robby::enterRoomRoutine));
 
 
     App*                app = (App*)App::instance();

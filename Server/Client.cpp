@@ -64,20 +64,18 @@ bool Client::leave()
     return true;
 }
 
-//bool Client::send(const Json::Value & json)
-//{
-//    std::string         str = json.toStyledString();
-//    std::vector<char>   bytes;
-//
-//    int                 size = str.length();
-//    char*               sizeRef = (char*)&size;
-//    
-//    bytes.insert(bytes.end(), sizeRef, sizeRef + sizeof(int));
-//    bytes.insert(bytes.end(), str.begin(), str.end());
-//
-//    return tcp::send(bytes);
-//}
-//
+bool Client::send(const Json::Value & json)
+{
+	Json::FastWriter	writer;
+	std::string			str = writer.write(json);
+
+	ostream&			ostream = this->out_stream();
+	ostream.write_u32(str.size())
+		.write(str.c_str(), str.size());
+
+	return true;
+}
+
 //bool Client::recv(Json::Value & json)
 //{
 //    if(tcp::recv(this->_buffer, sizeof(int)) == false)

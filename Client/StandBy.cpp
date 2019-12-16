@@ -3,7 +3,7 @@
 
 using namespace Scene;
 
-StandBy::StandBy(const std::string& filename, PB::Windows::sprite* sprite, PB::Windows::sprite* backgroundSprite, const std::string& backgroundName) : Base(filename, sprite, backgroundSprite, backgroundName), 
+StandBy::StandBy(const std::string& filename, PB::Windows::sprite* sprite, PB::Windows::sprite* backgroundSprite, const std::string& backgroundName) : BaseScene(filename, sprite, backgroundSprite, backgroundName), 
     _userList(Json::arrayValue)
 {
     for(int i = 0; i < MAX_CAPACITY; i++)
@@ -48,10 +48,10 @@ void StandBy::onCreate()
     __super::onCreate();
     App::instance()->scale(1.0f);
 
-    this->addEvent("stand by", static_cast<Base::BBPacketRoutine>(&StandBy::standByStateRoutine));
-    this->addEvent("ready", static_cast<Base::BBPacketRoutine>(&StandBy::readyRoutine));
-    this->addEvent("leave room", static_cast<Base::BBPacketRoutine>(&StandBy::disconnectedRoutine));
-    this->addEvent("disconnected", static_cast<Base::BBPacketRoutine>(&StandBy::disconnectedRoutine));
+    this->addEvent("stand by", static_cast<BaseScene::BBPacketRoutine>(&StandBy::standByStateRoutine));
+    this->addEvent("ready", static_cast<BaseScene::BBPacketRoutine>(&StandBy::readyRoutine));
+    this->addEvent("leave room", static_cast<BaseScene::BBPacketRoutine>(&StandBy::disconnectedRoutine));
+    this->addEvent("disconnected", static_cast<BaseScene::BBPacketRoutine>(&StandBy::disconnectedRoutine));
 
     App*                app = (App*)App::instance();
 
