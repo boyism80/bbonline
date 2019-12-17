@@ -61,6 +61,8 @@ public:
     bool                    containsTile(const rect_f& collisionTileRect, const char* type, bool left, bool top, bool right, bool bottom);
     bool                    comparePosition(const rect_f& collisionTileRect, const char* type, bool left, bool top, bool right, bool bottom);
 
+	void					callback(StateChangeRoutine callback);
+
 public:
     virtual void            update(float elapsedTime);
     virtual bool            jump(float velocity = 400.0f);

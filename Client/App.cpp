@@ -95,9 +95,15 @@ App::App(const char* ip, short port) : application(60, 1.0f), client(ip, port), 
 {
     try
     {
+		u_long opt = 0;
+		::ioctlsocket(this->_fd, FIONBIO, &opt);
+
         this->_character = NULL;
         if (this->connect() == false)
             throw std::exception("연결할 수 없습니다.");
+
+		opt = 1;
+		::ioctlsocket(this->_fd, FIONBIO, &opt);
     }
     catch(std::exception& e)
     {
@@ -109,6 +115,16 @@ App::~App()
 {
     if(this->_character != NULL)
         delete this->_character;
+}
+
+void App::send(Json::Value& json)
+{
+	Json::FastWriter writer;
+	std::string jsons = writer.write(json);
+	std::vector<char> buffer(jsons.begin(), jsons.end());
+
+	this->_ostream.write_u32(buffer.size())
+		.write(buffer.data(), buffer.size());
 }
 
 //
@@ -151,7 +167,7 @@ void App::onDestroy()
 
     Json::Value     json;
     json["method"]          = "disconnect";
-    this->send(Scene::BaseScene::encodeJson(json));
+	this->send(json);
 
     this->close();
 
@@ -174,7 +190,7 @@ void App::onConnected(tcp & sock)
     root["method"]          = "connect";
     root["success"]         = true;
 
-    sock.send(Scene::BaseScene::encodeJson(root));
+	this->send(root);
 }
 
 //
@@ -190,42 +206,81 @@ void App::onConnected(tcp & sock)
 //
 bool App::onReceive(tcp & sock)
 {
-    std::vector<char>           buffer;
-    Json::Value                 root;
-    try
-    {
-        if(this->recv(buffer, sizeof(int)) == false)
-            return false;
+    Json::Value             root;
+	bool					success = true;
+	uint8_t*				buffer = NULL;
+	uint8_t*				binary  = NULL;
 
-        int                     size    = *(int*)buffer.data();
-        if(this->recv(buffer, size) == false)
-            return false;
+	if(this->recv() == false)
+		return success;
 
-        if(Scene::BaseScene::decodeJson(buffer, root) == false)
-            return false;
+    while(true)
+	{
+		try
+		{
+			if(this->_istream.readable_size() < sizeof(uint32_t))
+				break;
 
-        std::string             method = root["method"].asString();
-        if (method.compare("connect") == 0)
-        {
-            int                 id = root["id"].asInt();
-            return true;
-        }
+			uint32_t size = this->_istream.read_u32();
+			if(size > this->_istream.capacity())
+				throw std::exception();
 
-        // 현재 씬을 얻는다.
-        Scene::BaseScene*        scene = (Scene::BaseScene*)this->currentScene();
-        if (scene == NULL)
-            return true;
+			if(buffer == NULL)
+				delete[] buffer;
+			buffer = new uint8_t[size];
+			this->_istream.read(buffer, size);
+
+			Json::Value root;
+			Json::Reader reader;
+			std::string jsons(buffer, buffer + size);
+			if(reader.parse(jsons, root) == false)
+				throw std::exception();
+
+			if(root.isMember("method") == false)
+				throw std::exception();
+			std::string method = root["method"].asString();
+
+			uint32_t binary_size = 0;
+			if(root.isMember("binary size"))
+			{
+				binary_size = root["binary size"].asInt();
+				if(this->_istream.readable_size() < binary_size)
+					break;
+
+				if(binary != NULL)
+					delete[] binary;
+				binary = new uint8_t[binary_size];
+				this->_istream.read(binary, binary_size);
+			}
+
+			// 현재 씬을 얻는다.
+			Scene::BaseScene*        scene = (Scene::BaseScene*)this->currentScene();
+			if (scene == NULL)
+				break;
 
 
-        // 현재 scene의 onReceive를 호출하면서 파싱된 json 객체를 넘겨준다.
-        scene->onReceive(sock, root);
-		return true;
-    }
-    catch(std::exception& e)
-    {
-        //MessageBoxA(NULL, e.what(), "", MB_OK);
-		return false;
-    }
+			// 현재 scene의 onReceive를 호출하면서 파싱된 json 객체를 넘겨준다.
+			scene->onReceive(*this, root);
+			this->_istream.shift(sizeof(uint32_t) + size + binary_size);
+			this->_istream.flush();
+		}
+		catch(std::exception& e)
+		{
+			//MessageBoxA(NULL, e.what(), "", MB_OK);
+			success = false;
+			break;
+		}
+	}
+
+	this->_istream.reset();
+
+	if(buffer != NULL)
+		delete[] buffer;
+
+	if(binary != NULL)
+		delete[] binary;
+
+	return success;
 }
 
 //

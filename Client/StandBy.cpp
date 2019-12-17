@@ -57,7 +57,7 @@ void StandBy::onCreate()
 
     Json::Value         json;
     json["method"]      = "stand by";
-    app->send(encodeJson(json));
+    app->send(json);
 }
 
 void StandBy::onFrameMove(float elapsedTime)
@@ -78,12 +78,12 @@ void Scene::StandBy::onCommand(window * control, const std::string & action, Jso
     if (control->id().compare("back") == 0)
     {
         json["method"] = "leave room";
-        app->send(encodeJson(json));
+        app->send(json);
     }
     else if(control->id().compare("ready") == 0)
     {
         json["method"] = "ready";
-        app->send(encodeJson(json));
+        app->send(json);
     }
 }
 
@@ -95,9 +95,9 @@ bool StandBy::onKeyboard(char vk, bool isDown)
     return true;
 }
 
-void StandBy::onReceive(tcp & socket, Json::Value & root)
+void StandBy::onReceive(App & app, Json::Value & root)
 {
-    __super::onReceive(socket, root);
+    __super::onReceive(app, root);
 }
 
 bool StandBy::standByStateRoutine(tcp & socket, Json::Value& request, const Json::Value& response)

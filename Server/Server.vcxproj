@@ -43,6 +43,8 @@
     <ClCompile Include="Room.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="acceptor.h" />
+    <ClInclude Include="acceptor.hpp" />
     <ClInclude Include="Bubble.h" />
     <ClInclude Include="Character.h" />
     <ClInclude Include="Client.h" />

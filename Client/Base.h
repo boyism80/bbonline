@@ -9,6 +9,8 @@
 using namespace PB;
 using namespace PB::Windows;
 
+class App;
+
 namespace Scene {
 
 class BaseScene : public scene
@@ -31,12 +33,8 @@ public:
     bool                    addEvent(const std::string& method, BBPacketRoutine callbackRoutine);
 
 public:
-    virtual void            onReceive(tcp& socket, Json::Value& response);
+    virtual void            onReceive(App& socket, Json::Value& response);
     virtual void            onDestroy();
-
-public:
-    static std::vector<char>    encodeJson(const Json::Value& json);
-    static bool             decodeJson(const std::vector<char>& bytes, Json::Value& json);
 };
 
 }

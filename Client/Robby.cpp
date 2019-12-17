@@ -48,12 +48,11 @@ void Robby::onCreate()
     this->addEvent("leave room",    static_cast<BaseScene::BBPacketRoutine>(&Robby::leaveRoomRoutine));
     this->addEvent("enter room",    static_cast<BaseScene::BBPacketRoutine>(&Robby::enterRoomRoutine));
 
+	Json::Value         json;
+	json["method"]      = "room list";
 
     App*                app = (App*)App::instance();
-
-    Json::Value         json;
-    json["method"]      = "room list";
-    app->send(encodeJson(json));
+    app->send(json);
 }
 
 void Robby::onFrameMove(float elapsedTime)
@@ -108,7 +107,7 @@ void Scene::Robby::onCommand(window * control, const std::string & action, Json:
                 json["method"] = "create room";
                 json["name"] = nameTextBox->text();
                 json["capacity"] = std::stoi(capacityTextBox->text());
-                app->send(encodeJson(json));
+                app->send(json);
 
                 dialog->visible(false);
             }
@@ -130,7 +129,7 @@ void Scene::Robby::onCommand(window * control, const std::string & action, Json:
             Json::Value         json;
             json["method"] = "enter room";
             json["id"] = id;
-            app->send(encodeJson(json));
+            app->send(json);
         }
 
         // 일반 컨트롤 이벤트
@@ -166,9 +165,9 @@ bool Robby::onKeyboard(char vk, bool isDown)
     return true;
 }
 
-void Robby::onReceive(tcp & socket, Json::Value & root)
+void Robby::onReceive(App & app, Json::Value & root)
 {
-    __super::onReceive(socket, root);
+    __super::onReceive(app, root);
 }
 
 void Scene::Robby::onDestroy()

@@ -16,9 +16,11 @@
 #include <strsafe.h>
 #pragma comment(lib, "User32.lib")
 
+#include "acceptor.h"
+
 using namespace PB;
 
-class App : public server
+class App : public base_acceptor<Client>
 {
 public:
     enum SendScope { ALL, ROOM, ROBBY, SELF };
@@ -26,7 +28,7 @@ public:
     enum CollisionType {TOP, BOTTOM, LEFT, RIGHT};
 
 public:
-    typedef bool (App::*BBPacketRoutine)(Client&, const Json::Value&, Json::Value&, SendScope&);
+    typedef bool (App::*ResponseFunc)(Client&, const Json::Value&, Json::Value&, SendScope&);
     typedef void (*PBCollisionInitRoutine)(Map* map, Life& life, float elapsedTime, Json::Value& parameters);
     typedef bool (*PBCollisionRoutine)(Map* map, int row, int col, const rect_f& tile, Life& life, float elapsedTime, Json::Value& parameters, CollisionType collisionType);
 
@@ -34,9 +36,9 @@ private:
     static App*     _instance;
 
 private:
-    std::unordered_map<int, Room*>                          _rooms;
-    std::unordered_map<std::string, Map*>                   _maps;
-    std::unordered_map<std::string, BBPacketRoutine>        _eventTable;
+    std::map<int, Room*>                    _rooms;
+    std::map<std::string, Map*>             _maps;
+    std::map<std::string, ResponseFunc>		_eventTable;
 
 private:
     App(short port);
@@ -44,7 +46,7 @@ private:
 
 private:
     bool                    loadMaps(const std::string& path);
-    bool                    addEvent(const std::string& method, BBPacketRoutine callbackRoutine);
+    bool                    addEvent(const std::string& method, ResponseFunc callbackRoutine);
     void                    methodEventProc(Client* client, Json::Value& json, uint8_t* binary, uint32_t binary_size);
 
 public:
@@ -74,7 +76,7 @@ public:
     bool                    shootBubbleRoutine(Client& client, const Json::Value& request, Json::Value& response, SendScope& scope);
 
 public:
-    static void             gameThreadRoutine(thread* thread);
+    void					gameThreadRoutine();
 
     static void             collisionLifeInitRoutine(Map* map, Life& life, float elapsedTime, Json::Value& parameters);
     static void             collisionLifeReleaseRoutine(Map* map, Life& life, float elapsedTime, Json::Value& parameters);
@@ -88,9 +90,9 @@ public:
     static void             enemyStateChangeRoutine(Life* sender, const std::string& name, Json::Value& value);
 
 public:
-    tcp*                    onConnected(tcp& socket);
-    void                    onDisconnected(tcp& socket);
-    bool                    onReceive(tcp& socket);
+	bool					handle_connected(Client& session);
+	bool					handle_disconnected(Client& session);
+	bool					handle_parse(Client& session);
 };
 
 #endif // !__GAMESERVER_H__

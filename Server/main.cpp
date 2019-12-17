@@ -9,6 +9,7 @@
 //#pragma comment(lib, "PBFramework/lib/x86/PBFramework.lib")
 #endif // _WIN64
 
+#include "PBThread.h"
 #include "App.h"
 #include <stdio.h>
 
@@ -24,7 +25,7 @@ int main(int argc, const char** argv)
     csection::init();
 
     App* server = App::instance();
-    server->run();
+    server->execute(true);
 
     while(true)
     {
@@ -34,7 +35,7 @@ int main(int argc, const char** argv)
             break;
     }
 
-    server->close();
+    server->exit();
     server->release();
     
 

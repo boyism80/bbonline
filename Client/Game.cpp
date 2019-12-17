@@ -113,7 +113,7 @@ void Game::onCreate()
     json["method"] = "generate";
 
     App*                    app = (App*)App::instance();
-    app->send(encodeJson(json));
+    app->send(json);
 }
 
 //
@@ -235,7 +235,7 @@ void Scene::Game::onCommand(window * control, const std::string & action, Json::
     {
         Json::Value             json;
         json["method"] = "leave room";
-        app->send(encodeJson(json));
+        app->send(json);
 
         this->get("leave game dialog")->visible(false);
     }
@@ -270,23 +270,23 @@ bool Game::onKeyboard(char vk, bool isDown)
         case VK_LEFT:
             json["method"] = "move";
             json["direction"] = "left";
-            app->send(encodeJson(json));
+            app->send(json);
             break;
 
         case VK_RIGHT:
             json["method"] = "move";
             json["direction"] = "right";
-            app->send(encodeJson(json));
+            app->send(json);
             break;
 
         case VK_UP:
             json["method"] = "jump";
-            app->send(encodeJson(json));
+            app->send(json);
             break;
 
         case VK_SPACE:
             json["method"] = "shot bubble";
-            app->send(encodeJson(json));
+            app->send(json);
             break;
 
         case VK_ESCAPE:
@@ -302,12 +302,12 @@ bool Game::onKeyboard(char vk, bool isDown)
         {
         case VK_LEFT:
             json["method"] = "stop";
-            app->send(encodeJson(json));
+            app->send(json);
             break;
 
         case VK_RIGHT:
             json["method"] = "stop";
-            app->send(encodeJson(json));
+            app->send(json);
             break;
         }
     }
@@ -327,9 +327,9 @@ bool Game::onKeyboard(char vk, bool isDown)
 // Return
 //  ¾øÀ½
 //
-void Game::onReceive(tcp & socket, Json::Value & root)
+void Game::onReceive(App & app, Json::Value & root)
 {
-    __super::onReceive(socket, root);
+    __super::onReceive(app, root);
 }
 
 void Scene::Game::onDestroy()

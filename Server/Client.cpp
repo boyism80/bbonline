@@ -1,12 +1,11 @@
 #include "Client.h"
 #include "Room.h"
 
-Client::Client(const socket & socket, StateChangeRoutine callback) : 
-    tcp(socket), 
+Client::Client(SOCKET fd, StateChangeRoutine callback) : 
+	base_session(fd), 
     Character(this->id(), callback),
     _order(-1)
 {
-    this->_isGenerated          = false;
     this->_isReady              = false;
 }
 
@@ -16,17 +15,7 @@ Client::~Client()
 
 int Client::id() const
 {
-    return (int)this->_fd;
-}
-
-bool Client::generated() const
-{
-    return this->_isGenerated;
-}
-
-void Client::generated(bool value)
-{
-    this->_isGenerated          = value;
+    return static_cast<SOCKET>(*this);
 }
 
 bool Client::ready() const
@@ -75,24 +64,6 @@ bool Client::send(const Json::Value & json)
 
 	return true;
 }
-
-//bool Client::recv(Json::Value & json)
-//{
-//    if(tcp::recv(this->_buffer, sizeof(int)) == false)
-//        return false;
-//
-//    int                     size = *(int*)(this->_buffer.data());
-//    if(tcp::recv(this->_buffer, size) == false)
-//        return false;
-//
-//    std::string             str(this->_buffer.begin(), this->_buffer.end());
-//    Json::Reader            reader;
-//
-//    if(reader.parse(str, json) == false)
-//        return false;
-//
-//    return true;
-//}
 
 Json::Value& Client::toJson(Json::Value & json)
 {

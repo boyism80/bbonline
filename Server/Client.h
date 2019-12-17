@@ -1,31 +1,30 @@
 #ifndef __CLIENT_H__
 #define __CLIENT_H__
 
+#include "PBThread.h"
 #include "PBSocket.h"
 #include "Character.h"
+#include "acceptor.h"
 using namespace PB;
 
 class Room;
 
-class Client : public tcp, public Character
+class Client : public base_session, public Character
 {
 private:
     std::vector<char>       _buffer;
 
 private:
     bool                    _connected;
-    bool                    _isGenerated;
     bool                    _isReady;
     int                     _order;             //게임방의 슬롯 순서
 
 public:
-    Client(const socket& socket, StateChangeRoutine callback);
+    Client(SOCKET fd, StateChangeRoutine callback = NULL);
     ~Client();
 
 public:
     int                     id() const;
-    bool                    generated() const;
-    void                    generated(bool value);
 
     bool                    ready() const;
     void                    ready(bool state);
@@ -38,7 +37,6 @@ public:
 
 public:
     bool                    send(const Json::Value& json);
-    //bool                    recv(Json::Value& json);
 
 public:
     virtual Json::Value&    toJson(Json::Value& json);

@@ -17,6 +17,7 @@
 #include "StandBy.h"
 #include "Character.h"
 #include "PBLeak.h"
+#include "PBStream.h"
 
 using namespace PB;
 using namespace PB::Windows;
@@ -35,6 +36,9 @@ public:
 public:
     App(const char* ip, short port);
     ~App();
+
+public:
+	void				send(Json::Value& json);
 
 public:
     void                onCreate();

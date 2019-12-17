@@ -33,7 +33,7 @@ public:
     void                onFrameRender(dcontextable& dc, float elapsedTime);
     void                onCommand(window * control, const std::string & action, Json::Value & parameters);
     bool                onKeyboard(char vk, bool isDown);
-    void                onReceive(tcp& socket, Json::Value& root);
+    void                onReceive(App& app, Json::Value& root);
     void                onDestroy();
 
 public:

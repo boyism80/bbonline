@@ -37,6 +37,9 @@
     <Filter Include="PBFramework">
       <UniqueIdentifier>{c6c8d214-8401-47d9-bf85-cd94ef9ac0d6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Acceptor">
+      <UniqueIdentifier>{7ec80e4b-f253-491c-8894-127c477c0fee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -136,6 +139,12 @@
     </ClInclude>
     <ClInclude Include="Config.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="acceptor.h">
+      <Filter>Source Files\Acceptor</Filter>
+    </ClInclude>
+    <ClInclude Include="acceptor.hpp">
+      <Filter>Source Files\Acceptor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
 #include "Base.h"
+#include "App.h"
 
 using namespace Scene;
 
@@ -43,12 +44,15 @@ bool BaseScene::addEvent(const std::string & method, BBPacketRoutine callbackRou
 // Return
 //  없음
 //
-void BaseScene::onReceive(tcp & socket, Json::Value & response)
+void BaseScene::onReceive(App & app, Json::Value & response)
 {
+	if(response.isMember("method") == false)
+		return;
+
     std::string             method      = response["method"].asString();
     Json::Value             request;
-    request["method"]                   = method;
 
+	request["method"]       = method;
     try
     {
         // 이벤트 테이블로부터 대응되는 핸들러 메소드를 찾는다.
@@ -60,11 +64,11 @@ void BaseScene::onReceive(tcp & socket, Json::Value & response)
         request["success"]              = true;
 
         // 호출한다.
-        if((this->*i->second)(socket, request, response) == false)
+        if((this->*i->second)(app, request, response) == false)
             return;
 
         // 핸들러로부터 얻은 request 객체를 서버에 보낸다.
-        socket.send(encodeJson(request));
+        //socket.send(encodeJson(request));
     }
     catch(std::exception& e)
     {
@@ -72,33 +76,17 @@ void BaseScene::onReceive(tcp & socket, Json::Value & response)
         request["error"]                = e.what();
         //socket.send(encodeJson(request));         // 이 부분 주석 풀면 렉 엄청 걸림
     }
+
+	
+	Json::FastWriter writer;
+	std::string jsons = writer.write(response);
+
+	ostream& ostream = app.out_stream();
+	ostream.write_u32(jsons.size())
+		.write(jsons.data(), jsons.size());
 }
 
 void BaseScene::onDestroy()
 {
     this->_sound.stop();
-}
-
-std::vector<char> BaseScene::encodeJson(const Json::Value & json)
-{
-    
-    std::string         str = json.toStyledString();
-    int                 size = str.length();
-    char*               sizeRef = (char*)&size;
-
-    std::vector<char>   buffer;
-    buffer.insert(buffer.end(), sizeRef, sizeRef + sizeof(int));
-    buffer.insert(buffer.end(), str.begin(), str.end());
-    return buffer;
-}
-
-bool BaseScene::decodeJson(const std::vector<char>& bytes, Json::Value& json)
-{
-    std::string     str(bytes.begin(), bytes.end());
-    Json::Reader    reader;
-
-    if (reader.parse(str, json) == false)
-        return false;
-
-    return true;
 }

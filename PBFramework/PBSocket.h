@@ -4,7 +4,7 @@
 #pragma comment(lib, "ws2_32.lib")
 
 #include "PBObject.h"
-#include "PBThread.h"
+#include <thread>
 #include <Windows.h>
 #include <exception>
 #include <unordered_map>
@@ -15,144 +15,69 @@
 
 namespace PB {
 
-    class __declspec(dllexport) socket : public virtual object
-    {
-    private:
-        static WSAData          _wsa;
+class __declspec(dllexport) socket : public virtual object
+{
+private:
+	static WSAData          _wsa;
 
-    protected:
-        SOCKET                  _fd;
+private:
+	SOCKET					_fd;
+	istream					_istream;
+	ostream					_ostream;
 
-    protected:
-        socket(int af, int type, int protocol)                  throw (std::exception);
-        socket(SOCKET sock);
-        virtual ~socket();
+protected:
+	socket(SOCKET socket);
+public:
+	virtual ~socket();
 
-    public:
-        bool                    bind(short port);
-        void                    close();
-        bool                    peername(std::string* ip, int* port) const;
+protected:
+	bool					valid() const;
 
-    public:
-        const std::string       toString() const;
+public:
+	bool					send();
+	bool					recv();
+	void					close();
 
-    public:
-        operator                SOCKET () const;
-        operator                const std::string () const;
+public:
+	istream&				in_stream();
+	ostream&				out_stream();
 
-    public:
-        static void             init();
-        static void             release();
-    };
+public:
+	operator				SOCKET () const;
 
-    class __declspec(dllexport) tcp : public socket
-    {
-	private:
-		istream					_istream;
-		ostream					_ostream;
+public:
+	static void				init();
+	static void				release();
+};
 
-    public:
-        tcp();
-        tcp(SOCKET sock);
-        virtual ~tcp();
 
-    public:
-        bool                    listen();
-        tcp                     accept();
-        bool                    connect(const std::string& ip, short port);
+class __declspec(dllexport) socket_map : private std::map<SOCKET, socket*>
+{
+private:
+	fd_set					_fd_set;
+	socket*					_root;
 
-        bool                    send();
-        bool                    recv();
+public:
+	using std::map<SOCKET, socket*>::find;
+	using std::map<SOCKET, socket*>::begin;
+	using std::map<SOCKET, socket*>::end;
 
-	public:
-		istream&				in_stream();
-		ostream&				out_stream();
-    };
+public:
+	socket_map();
+	~socket_map();
 
-    class __declspec(dllexport) udp : public socket
-    {
-    public:
-        udp();
-        virtual ~udp();
+public:
+	bool					add(SOCKET fd, socket* socket);
+	bool					root(SOCKET fd, socket* socket);
+	bool					reduce(SOCKET fd);
+	void					clear();
+	socket*					get(SOCKET fd) const;
+	bool					contains(SOCKET fd) const;
 
-        bool                    sendto(const std::string& ip, short port, const std::vector<char>& bytes);
-        bool                    recvfrom(std::string& ip, short* port, std::vector<char>& stream);
-    };
-
-    class __declspec(dllexport) socket_map : private std::map<SOCKET, tcp*>
-    {
-    public:
-        typedef std::map<SOCKET, tcp*>::iterator iterator;
-        typedef std::map<SOCKET, tcp*>::const_iterator citerator;
-
-    public:
-        socket_map();
-        ~socket_map();
-
-    public:
-        bool                    add(tcp* socket);
-        bool                    remove(tcp*);
-        void                    clear();
-
-        iterator                begin();
-        iterator                end();
-
-        citerator               begin() const;
-        citerator               end() const;
-
-    public:
-        operator                const fd_set& () const;
-    };
-
-    class __declspec(dllexport) client : public tcp
-    {
-    private:
-        std::string             _host;
-        int                     _port;
-        thread                  _thread;
-
-    protected:
-        client(const std::string& host, short port);
-        virtual ~client();
-
-    public:
-        bool                    connect();
-
-    public:
-        virtual void            onConnected(tcp& sock) {}
-        virtual bool            onReceive(tcp& sock) { return true; }
-        virtual void            onDisconnect(tcp& sock) {}
-
-    public:
-        static void             onThreadRoutine(thread* self);
-    };
-
-    class __declspec(dllexport) server : public tcp
-    {
-    private:
-        std::string             _host;
-        int                     _port;
-        socket_map              _clients;
-        thread                  _thread;
-        bool                    _running;
-
-    public:
-        server(int port);
-        virtual ~server();
-
-    public:
-        bool                    run();
-        bool                    close();
-        socket_map*             clients();
-
-    public:
-        virtual tcp*            onConnected(tcp& socket) { return new tcp(socket); }
-        virtual void            onDisconnected(tcp& socket) { }
-        virtual bool            onReceive(tcp& socket) { return false; }
-
-    public:
-        static void             onThreadRoutine(thread* t);
-    };
+public:
+	socket*					operator [] (SOCKET fd);
+	operator				fd_set& ();
+};
 
 }
 

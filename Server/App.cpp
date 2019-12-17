@@ -3,11 +3,8 @@
 
 App* App::_instance     = NULL;
 
-App::App(short port) : server(port)
+App::App(short port) : base_acceptor<Client>(port)
 {
-    this->bind(port);
-    this->listen();
-
     this->loadMaps("Resources/maps");
 
     this->addEvent("connect",       &App::connectRoutine);
@@ -28,13 +25,12 @@ App::App(short port) : server(port)
 
 App::~App()
 {
-    for(std::unordered_map<int, Room*>::iterator i = this->_rooms.begin(); i != this->_rooms.end(); i++)
+    for(auto i = this->_rooms.begin(); i != this->_rooms.end(); i++)
         delete i->second;
 
     for (auto i = this->_maps.begin(); i != this->_maps.end(); i++)
         delete i->second;
 
-    this->close();
 }
 
 //
@@ -74,7 +70,7 @@ bool App::loadMaps(const std::string & path)
     return true;
 }
 
-bool App::addEvent(const std::string & method, BBPacketRoutine callbackRoutine)
+bool App::addEvent(const std::string & method, ResponseFunc callbackRoutine)
 {
     this->_eventTable.insert(std::make_pair(method, callbackRoutine));
     return true;
@@ -98,7 +94,7 @@ void App::methodEventProc(Client* client, Json::Value& json, uint8_t* binary, ui
     try
     {
         // 이벤트 테이블에서 해당 method에 대응되는 이벤트가 있는지 검사한다.
-        std::unordered_map<std::string, BBPacketRoutine>::iterator i = this->_eventTable.find(method);
+        auto i = this->_eventTable.find(method);
         if(i == this->_eventTable.end())
             throw std::exception("Undefined 'method' field");
 
@@ -120,24 +116,24 @@ void App::methodEventProc(Client* client, Json::Value& json, uint8_t* binary, ui
 
         // 응답할 대상의 범위에 맞게 응답해준다.
 csection::enter("room");
-        //switch(scope)
-        //{
-        //case SendScope::ALL:
-        //    this->sendAll(response);
-        //    break;
+        switch(scope)
+        {
+        case SendScope::ALL:
+            this->sendAll(response);
+            break;
 
-        //case SendScope::ROOM:
-        //    this->sendRoom(client->room() != NULL ? client->room() : room, response);
-        //    break;
+        case SendScope::ROOM:
+            this->sendRoom(client->room() != NULL ? client->room() : room, response);
+            break;
 
-        //case SendScope::ROBBY:
-        //    this->sendRobby(response);
-        //    break;
+        case SendScope::ROBBY:
+            this->sendRobby(response);
+            break;
 
-        //case SendScope::SELF:
-        //    client->send(response);
-        //    break;
-        //}
+        case SendScope::SELF:
+            client->send(response);
+            break;
+        }
 
 csection::leave("room");
     }
@@ -148,7 +144,7 @@ csection::leave("room");
         json["error"]       = e.what();
         json["success"]     = false;
 
-        //client->send(json);
+        client->send(json);
 csection::leave("room");
     }
 }
@@ -211,10 +207,10 @@ csection::leave("room");
 //
 bool App::sendRobby(Json::Value & json)
 {
-    socket_map*         clients     = this->clients();
-    for(socket_map::iterator i = clients->begin(); i != clients->end(); i++)
+	std::vector<Client*>& sessions = this->sessions();
+    for(auto i = sessions.begin(); i != sessions.end(); i++)
     {
-        Client*             client      = (Client*)i->second;
+        Client*             client = *i;
         if(client->entered())
             continue;
 
@@ -236,10 +232,10 @@ bool App::sendRobby(Json::Value & json)
 //
 bool App::sendAll(Json::Value & json)
 {
-    socket_map*         clients     = this->clients();
-    for(socket_map::iterator i = clients->begin(); i != clients->end(); i++)
-    {
-        Client*             client      = (Client*)i->second;
+	std::vector<Client*>& sessions = this->sessions();
+	for(auto i = sessions.begin(); i != sessions.end(); i++)
+	{
+		Client*             client = *i;
         client->send(json);
     }
 
@@ -562,7 +558,7 @@ bool App::enterRoomRoutine(Client & client, const Json::Value & request, Json::V
     int                 roomIndex   = request["id"].asInt();
 
 csection::enter("room");
-    std::unordered_map<int, Room*>::iterator i = this->_rooms.find(roomIndex);
+    auto i = this->_rooms.find(roomIndex);
     if(i == this->_rooms.end())
     {
 csection::leave("room");
@@ -693,7 +689,7 @@ bool App::readyRoutine(Client & client, const Json::Value & request, Json::Value
             room->client(i)->ready(false);
         }
 
-        thread::run(gameThreadRoutine, room);
+        //thread::run(gameThreadRoutine, room);
 
         response["state"] = "in game";
         room->state(Room::State::GAME);
@@ -986,234 +982,236 @@ csection::leave("room");
 // Return
 //  없음
 //
-void App::gameThreadRoutine(thread * thread)
-{
-    Room*                   room                = (Room*)thread->parameter();   // 게임방(파라미터로 넘어옴)
-    int                     fps                 = 60;                           // 1초에 30번 업데이트한다.
-    int                     begin               = ::GetTickCount();             // 정보를 처리하기 시작한 시간을 저장
-    float                   duration            = 1000 / fps;                   // 한번 처리하는데 걸려야 하는 시간
-    float                   elapsedTime         = 0.0f;                         // 실제 진행 시간
-    float                   playTime            = 0.0f;
-
-csection::enter("room");
-    room->init();
-csection::leave("room");
-
-    App*                    app = App::instance();
-
-    while (true)
-    {
-csection::enter("room");
-        if(room->isEmpty())         // 게임방에 접속한 클라이언트가 없다면 스레드 종료
-        {
-#if defined DEBUG | defined _DEBUG
-            printf("%d번 방의 게임 스레드는 모든 사용자가 종료하였으므로 파괴됩니다.\n", room->id());
-#endif
-csection::leave("room");
-            break;
-        }
-
-        if(room->isLose())
-        {
-            Json::Value     response;
-            response["method"]              = "lose game";
-            app->sendRoom(room, response);
-csection::leave("room");
-            break;
-        }
-
-
-        if(room->isClear())                     // 게임방에 적군이 더 이상 존재하지 않는다면 다음 스테이지로 이동
-        {
-            Json::Value     response;
-
-            if(room->nextLevel())               // 더이상 이동할 스테이지가 없다면 게임클리어 처리
-            {
-                response["method"]          = "clear game";
-                app->sendRoom(room, response);
-csection::leave("room");
-                break;                          // 게임 클리어 후 스레드 종료
-            }
-            else
-            {
-                // 캐릭터의 위치를 변화시킨다.
-                Map*                map     = app->_maps[room->mapName()];
-                for (int i = 0; i < room->capacity(); i++)
-                    room->respawn(i, map->respawnPoint(i));
-
-                // 이 부분은 나중에 맵 툴에서 처리해야할 것 같다. 임시로 적군을 추가해준다.
-                for (auto i = map->enemies().begin(); i != map->enemies().end(); i++)
-                    room->enter(new Enemy(**i, enemyStateChangeRoutine));
-
-
-                // 스테이지를 클리어했다고 알려준다.
-                response["method"]          = "clear stage";
-                response["level"]           = room->level();
-                app->sendRoom(room, response);
-            }
-        }
-
-        // Character 업데이트
-        for(int i = 0; i < room->capacity(); i++)
-        {
-            Client*         existed = room->client(i);
-            if(existed == NULL)
-                continue;
-
-            Character&      character = *existed;
-            character.update(elapsedTime);
-            app->collision(room->mapName(), character, elapsedTime, true, collisionLifeInitRoutine, collisionLifeReleaseRoutine, collisionCharacterRoutine);
-        }
-
-        // Enemy 업데이트
-        for (auto i = room->enemies().begin(); i != room->enemies().end(); i++)
-        {
-            Enemy&          enemy = *(*i);
-
-            enemy.update(elapsedTime);
-            app->collision(room->mapName(), enemy, elapsedTime, true, collisionLifeInitRoutine, collisionLifeReleaseRoutine, collisionEnemyRoutine);
-        }
-
-        // Bubble 업데이트
-        for (auto i = room->bubbles().begin(); i != room->bubbles().end(); i++)
-        {
-            Bubble&         bubble = *(*i);
-            bubble.update(elapsedTime);
-            app->collision(room->mapName(), bubble, elapsedTime, false, NULL, NULL, collisionBubbleRoutine);
-        }
-
-
-        // Enemy와 character의 충돌체크
-        for (int i = 0; i < room->capacity(); i++)
-        {
-            Client*         existed = room->client(i);
-            if(existed == NULL)
-                continue;
-
-            Character&      character = *existed;
-            for (auto i = room->enemies().begin(); i != room->enemies().end(); i++)
-            {
-                Enemy&      enemy = *(*i);
-
-                if(character.collisionRect().contains(enemy.collisionRect()) == false)
-                    continue;
-
-                if(enemy.isPrison())
-                    continue;
-
-                character.isAlive(false);
-                break;
-            }
-        }
-
-        
-        // Bubble과 enemy의 충돌체크
-        for(auto i = room->bubbles().begin(); i != room->bubbles().end(); i++)
-        {
-            Bubble&         bubble      = *(*i);
-            for(auto i = room->enemies().begin(); i != room->enemies().end(); i++)
-            {
-                Enemy&      enemy       = *(*i);
-
-                if(bubble.collisionRect().contains(enemy.collisionRect()) == false)
-                    continue;
-
-                if(bubble.prison(&enemy))
-                    break;
-            }
-        }
-
-        // Bubble과 character의 충돌체크
-        for (int i = 0; i < room->capacity(); i++)
-        {
-            Client*         existed = room->client(i);
-            if(existed == NULL)
-                continue;
-
-            Character&      character = *existed;
-            for (auto i = room->bubbles().begin(); i != room->bubbles().end(); i++)
-            {
-                Bubble*     bubble      = (*i);
-
-                if(bubble->isShooting())
-                    continue;
-
-                if(character.collisionRect().contains(bubble->collisionRect()) == false)
-                    continue;
-
-                // 충돌되었는데 그 안에 갇힌 적군이 있다면 적군이 죽었다고 알려준다.
-                Enemy*      enemy       = bubble->prisonEnemy();
-                if(enemy != NULL)
-                {
-                    enemy->isAlive(false);
-                    room->leave(enemy);
-                }
-                room->leave(bubble);
-
-                break;
-            }
-        }
-
-
-        // 게임방의 클라이언트들의 정보를 json에 담는다.
-        Json::Value         users(Json::arrayValue);
-        for (int i = 0; i < room->capacity(); i++)
-        {
-            Json::Value                     json;
-            Client*                         client = room->client(i);
-            if(client == NULL)
-                continue;
-            
-            users.append(client->toJson(json));
-        }
-
-        // 게임방의 적군들의 정보를 json에 담는다.
-        Json::Value             enemies(Json::arrayValue);
-        for (auto i = room->enemies().begin(); i != room->enemies().end(); i++)
-        {
-            Json::Value                     json;
-            Enemy*                          enemy = (*i);
-            enemies.append(enemy->toJson(json));
-        }
-
-
-        // 게임방의 버블 정보를 json에 담는다.
-        Json::Value         bubbles(Json::arrayValue);
-        for (auto i = room->bubbles().begin(); i != room->bubbles().end(); i++)
-        {
-            Bubble*                         bubble = *i;
-            Json::Value                     json;
-            bubbles.append(bubble->toJson(json));
-        }
-
-
-        // 위에서 저장했던 json을 통합하여 보낸다.
-        Json::Value                         response;
-        response["method"]                  = "update";
-        response["success"]                 = true;
-        response["user"]                    = users;
-        response["enemies"]                 = enemies;
-        response["bubbles"]                 = bubbles;
-        app->sendRoom(room, response);
-csection::leave("room");
-
-        // 총 처리한 시간을 구한다.
-        int                 useTime = ::GetTickCount() - begin;
-
-        // 한번 처리하는데 걸려야 할 시간보다 더 일찍 처리했다면 sleep해준다.
-        if (useTime < duration)
-            Sleep(duration - useTime);
-
-        // 실제 처리하는데 걸린 진행시간을 얻는다.
-        elapsedTime                         = (::GetTickCount() - begin) / 1000.0f;
-        playTime += elapsedTime;
-
-        // begin을 다시 초기화
-        begin                               = ::GetTickCount();
-    }
-
-    app->destroyRoom(room);
-}
+//void App::gameThreadRoutine()
+//{
+//    int                     fps                 = 60;                           // 1초에 30번 업데이트한다.
+//    int                     begin               = ::GetTickCount();             // 정보를 처리하기 시작한 시간을 저장
+//    float                   duration            = 1000 / fps;                   // 한번 처리하는데 걸려야 하는 시간
+//    float                   elapsedTime         = 0.0f;                         // 실제 진행 시간
+//    float                   playTime            = 0.0f;
+//
+//
+//	// 여기서 모든 room의 게임 상태를 처리
+//
+//csection::enter("room");
+//    room->init();
+//csection::leave("room");
+//
+//    App*                    app = App::instance();
+//
+//    while (true)
+//    {
+//csection::enter("room");
+//        if(room->isEmpty())         // 게임방에 접속한 클라이언트가 없다면 스레드 종료
+//        {
+//#if defined DEBUG | defined _DEBUG
+//            printf("%d번 방의 게임 스레드는 모든 사용자가 종료하였으므로 파괴됩니다.\n", room->id());
+//#endif
+//csection::leave("room");
+//            break;
+//        }
+//
+//        if(room->isLose())
+//        {
+//            Json::Value     response;
+//            response["method"]              = "lose game";
+//            app->sendRoom(room, response);
+//csection::leave("room");
+//            break;
+//        }
+//
+//
+//        if(room->isClear())                     // 게임방에 적군이 더 이상 존재하지 않는다면 다음 스테이지로 이동
+//        {
+//            Json::Value     response;
+//
+//            if(room->nextLevel())               // 더이상 이동할 스테이지가 없다면 게임클리어 처리
+//            {
+//                response["method"]          = "clear game";
+//                app->sendRoom(room, response);
+//csection::leave("room");
+//                break;                          // 게임 클리어 후 스레드 종료
+//            }
+//            else
+//            {
+//                // 캐릭터의 위치를 변화시킨다.
+//                Map*                map     = app->_maps[room->mapName()];
+//                for (int i = 0; i < room->capacity(); i++)
+//                    room->respawn(i, map->respawnPoint(i));
+//
+//                // 이 부분은 나중에 맵 툴에서 처리해야할 것 같다. 임시로 적군을 추가해준다.
+//                for (auto i = map->enemies().begin(); i != map->enemies().end(); i++)
+//                    room->enter(new Enemy(**i, enemyStateChangeRoutine));
+//
+//
+//                // 스테이지를 클리어했다고 알려준다.
+//                response["method"]          = "clear stage";
+//                response["level"]           = room->level();
+//                app->sendRoom(room, response);
+//            }
+//        }
+//
+//        // Character 업데이트
+//        for(int i = 0; i < room->capacity(); i++)
+//        {
+//            Client*         existed = room->client(i);
+//            if(existed == NULL)
+//                continue;
+//
+//            Character&      character = *existed;
+//            character.update(elapsedTime);
+//            app->collision(room->mapName(), character, elapsedTime, true, collisionLifeInitRoutine, collisionLifeReleaseRoutine, collisionCharacterRoutine);
+//        }
+//
+//        // Enemy 업데이트
+//        for (auto i = room->enemies().begin(); i != room->enemies().end(); i++)
+//        {
+//            Enemy&          enemy = *(*i);
+//
+//            enemy.update(elapsedTime);
+//            app->collision(room->mapName(), enemy, elapsedTime, true, collisionLifeInitRoutine, collisionLifeReleaseRoutine, collisionEnemyRoutine);
+//        }
+//
+//        // Bubble 업데이트
+//        for (auto i = room->bubbles().begin(); i != room->bubbles().end(); i++)
+//        {
+//            Bubble&         bubble = *(*i);
+//            bubble.update(elapsedTime);
+//            app->collision(room->mapName(), bubble, elapsedTime, false, NULL, NULL, collisionBubbleRoutine);
+//        }
+//
+//
+//        // Enemy와 character의 충돌체크
+//        for (int i = 0; i < room->capacity(); i++)
+//        {
+//            Client*         existed = room->client(i);
+//            if(existed == NULL)
+//                continue;
+//
+//            Character&      character = *existed;
+//            for (auto i = room->enemies().begin(); i != room->enemies().end(); i++)
+//            {
+//                Enemy&      enemy = *(*i);
+//
+//                if(character.collisionRect().contains(enemy.collisionRect()) == false)
+//                    continue;
+//
+//                if(enemy.isPrison())
+//                    continue;
+//
+//                character.isAlive(false);
+//                break;
+//            }
+//        }
+//
+//        
+//        // Bubble과 enemy의 충돌체크
+//        for(auto i = room->bubbles().begin(); i != room->bubbles().end(); i++)
+//        {
+//            Bubble&         bubble      = *(*i);
+//            for(auto i = room->enemies().begin(); i != room->enemies().end(); i++)
+//            {
+//                Enemy&      enemy       = *(*i);
+//
+//                if(bubble.collisionRect().contains(enemy.collisionRect()) == false)
+//                    continue;
+//
+//                if(bubble.prison(&enemy))
+//                    break;
+//            }
+//        }
+//
+//        // Bubble과 character의 충돌체크
+//        for (int i = 0; i < room->capacity(); i++)
+//        {
+//            Client*         existed = room->client(i);
+//            if(existed == NULL)
+//                continue;
+//
+//            Character&      character = *existed;
+//            for (auto i = room->bubbles().begin(); i != room->bubbles().end(); i++)
+//            {
+//                Bubble*     bubble      = (*i);
+//
+//                if(bubble->isShooting())
+//                    continue;
+//
+//                if(character.collisionRect().contains(bubble->collisionRect()) == false)
+//                    continue;
+//
+//                // 충돌되었는데 그 안에 갇힌 적군이 있다면 적군이 죽었다고 알려준다.
+//                Enemy*      enemy       = bubble->prisonEnemy();
+//                if(enemy != NULL)
+//                {
+//                    enemy->isAlive(false);
+//                    room->leave(enemy);
+//                }
+//                room->leave(bubble);
+//
+//                break;
+//            }
+//        }
+//
+//
+//        // 게임방의 클라이언트들의 정보를 json에 담는다.
+//        Json::Value         users(Json::arrayValue);
+//        for (int i = 0; i < room->capacity(); i++)
+//        {
+//            Json::Value                     json;
+//            Client*                         client = room->client(i);
+//            if(client == NULL)
+//                continue;
+//            
+//            users.append(client->toJson(json));
+//        }
+//
+//        // 게임방의 적군들의 정보를 json에 담는다.
+//        Json::Value             enemies(Json::arrayValue);
+//        for (auto i = room->enemies().begin(); i != room->enemies().end(); i++)
+//        {
+//            Json::Value                     json;
+//            Enemy*                          enemy = (*i);
+//            enemies.append(enemy->toJson(json));
+//        }
+//
+//
+//        // 게임방의 버블 정보를 json에 담는다.
+//        Json::Value         bubbles(Json::arrayValue);
+//        for (auto i = room->bubbles().begin(); i != room->bubbles().end(); i++)
+//        {
+//            Bubble*                         bubble = *i;
+//            Json::Value                     json;
+//            bubbles.append(bubble->toJson(json));
+//        }
+//
+//
+//        // 위에서 저장했던 json을 통합하여 보낸다.
+//        Json::Value                         response;
+//        response["method"]                  = "update";
+//        response["success"]                 = true;
+//        response["user"]                    = users;
+//        response["enemies"]                 = enemies;
+//        response["bubbles"]                 = bubbles;
+//        app->sendRoom(room, response);
+//csection::leave("room");
+//
+//        // 총 처리한 시간을 구한다.
+//        int                 useTime = ::GetTickCount() - begin;
+//
+//        // 한번 처리하는데 걸려야 할 시간보다 더 일찍 처리했다면 sleep해준다.
+//        if (useTime < duration)
+//            Sleep(duration - useTime);
+//
+//        // 실제 처리하는데 걸린 진행시간을 얻는다.
+//        elapsedTime                         = (::GetTickCount() - begin) / 1000.0f;
+//        playTime += elapsedTime;
+//
+//        // begin을 다시 초기화
+//        begin                               = ::GetTickCount();
+//    }
+//
+//    app->destroyRoom(room);
+//}
 
 void App::collisionLifeInitRoutine(Map * map, Life & life, float elapsedTime, Json::Value & parameters)
 {
@@ -1364,51 +1362,51 @@ void App::enemyStateChangeRoutine(Life* sender, const std::string& name, Json::V
     framework->sendRoom(room, json);
 }
 
-tcp* App::onConnected(tcp& socket) 
+bool App::handle_connected(Client& session)
 {
-    return new Client(socket, this->stateChangeRoutine);
+	session.callback(App::stateChangeRoutine);
+	return true;
 }
 
-void App::onDisconnected(tcp& socket)
+bool App::handle_disconnected(Client& session)
 {
-    Client*                 client  = (Client*)&socket;
-    Room*                   room    = client->room();
-    if(room != NULL)
-    {
-        room->leave(client);
+	Room*                   room    = session.room();
+	if(room != NULL)
+	{
+		room->leave(&session);
 
-        if (room->isEmpty())
-        {
-            this->_rooms.erase(room->id());
+		if (room->isEmpty())
+		{
+			this->_rooms.erase(room->id());
 #if defined DEBUG | defined _DEBUG
-            printf("%d번 방은 사용자가 모두 종료하였으므로 파괴됩니다.\n", room->id());
+			printf("%d번 방은 사용자가 모두 종료하였으므로 파괴됩니다.\n", room->id());
 #endif
-        }
-        else
-        {
-            Json::Value     json;
-            json["method"]          = "disconnected";
-            json["id"]              = client->id();
+		}
+		else
+		{
+			Json::Value     json;
+			json["method"]          = "disconnected";
+			json["id"]              = session.id();
 
-            this->sendRoom(room, json);
-        }
-    }
+			this->sendRoom(room, json);
+		}
+	}
+	
+	return true;
 }
 
-bool App::onReceive(tcp& socket)
+bool App::handle_parse(Client& session)
 {
-    //Client*                 client  = (Client*)&socket;
 	bool					success = true;
 	uint8_t*				buffer  = NULL;
 	uint8_t*				binary  = NULL;
-	uint32_t				binary_size = 0;
 
 	// 데이터를 읽어들임
-	if(socket.recv() == false)
+	if(session.recv() == false)
 		return false;
 
 	// 누적된 데이터 파싱
-	istream&			istream   = socket.in_stream();
+	istream&			istream   = session.in_stream();
 	while(true)
 	{
 		try
@@ -1440,7 +1438,7 @@ bool App::onReceive(tcp& socket)
 			std::string method = root["method"].asString();
 
 
-			binary_size = 0;
+			uint32_t binary_size = 0;
 			if(root.isMember("binary size"))
 			{
 				binary_size = root["binary size"].asInt();
@@ -1453,7 +1451,11 @@ bool App::onReceive(tcp& socket)
 				istream.read(binary, binary_size);
 			}
 
-			this->methodEventProc((Client*)&socket, root, binary, binary_size);
+			this->methodEventProc((Client*)&session, root, binary, binary_size);
+			istream.shift(sizeof(uint32_t) + size + binary_size);
+			istream.flush();
+
+			// shift 해줘야함
 		}
 		catch(std::exception& e)
 		{

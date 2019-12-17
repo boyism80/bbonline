@@ -357,6 +357,11 @@ bool Life::comparePosition(const rect_f & collisionTileRect, const char * type, 
     return true;
 }
 
+void Life::callback(StateChangeRoutine callback)
+{
+	this->_callback = callback;
+}
+
 //
 // update
 //  오브젝트의 상태를 업데이트한다.
