@@ -91,19 +91,16 @@ void App::config(WNDCLASS* wc, rect& clientRect)
 //  없음
 //
 //
-App::App(const char* ip, short port) : application(60, 1.0f), client(ip, port), _spriteGUI(L"Resources/sprite/windows.pbs"), _backgroundSprite(L"Resources/sprite/background.pbs")
+App::App(const char* ip, short port) : 
+	application(60, 1.0f), 
+	_spriteGUI(L"Resources/sprite/windows.pbs"), 
+	_backgroundSprite(L"Resources/sprite/background.pbs"), 
+	_character(NULL)
 {
     try
     {
-		u_long opt = 0;
-		::ioctlsocket(this->_fd, FIONBIO, &opt);
-
-        this->_character = NULL;
-        if (this->connect() == false)
-            throw std::exception("연결할 수 없습니다.");
-
-		opt = 1;
-		::ioctlsocket(this->_fd, FIONBIO, &opt);
+        //if (this->connect() == false)
+        //    throw std::exception("연결할 수 없습니다.");
     }
     catch(std::exception& e)
     {
@@ -184,7 +181,7 @@ void App::onDestroy()
 // Return
 //  없음
 //
-void App::onConnected(tcp & sock)
+void App::onConnected(App & sock)
 {
     Json::Value             root;
     root["method"]          = "connect";
@@ -204,7 +201,7 @@ void App::onConnected(tcp & sock)
 // Return
 //  없음
 //
-bool App::onReceive(tcp & sock)
+bool App::onReceive(App & sock)
 {
     Json::Value             root;
 	bool					success = true;
@@ -293,6 +290,6 @@ bool App::onReceive(tcp & sock)
 // Return
 //  없음
 //
-void App::onDisconnect(tcp & sock)
+void App::onDisconnect(App & sock)
 {
 }

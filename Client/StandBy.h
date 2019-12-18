@@ -34,10 +34,10 @@ public:
     void                onReceive(App& app, Json::Value& root);
 
 public:
-    bool                standByStateRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                readyRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                leaveRoomRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                disconnectedRoutine(tcp&, Json::Value&, const Json::Value&);
+    bool                standByStateRoutine(App&, Json::Value&, const Json::Value&);
+    bool                readyRoutine(App&, Json::Value&, const Json::Value&);
+    bool                leaveRoomRoutine(App&, Json::Value&, const Json::Value&);
+    bool                disconnectedRoutine(App&, Json::Value&, const Json::Value&);
 };
 
 }

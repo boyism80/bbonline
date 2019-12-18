@@ -48,25 +48,25 @@ public:
     void                    onDestroy();
 
 public:
-    bool                    enterRoomRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                    leaveRoomRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                    mapRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                    generateRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                    updateRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                    stopRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                    shotBubbleRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                    enemyDieRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                    clearStageRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                    clearGameRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                    loseGameRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                    disconnectedRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                    moveRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                    defaultRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                    jumpRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                    aliveRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                    shootRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                    respawnRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                    prisonRoutine(tcp&, Json::Value&, const Json::Value&);
+    bool                    enterRoomRoutine(App&, Json::Value&, const Json::Value&);
+    bool                    leaveRoomRoutine(App&, Json::Value&, const Json::Value&);
+    bool                    mapRoutine(App&, Json::Value&, const Json::Value&);
+    bool                    generateRoutine(App&, Json::Value&, const Json::Value&);
+    bool                    updateRoutine(App&, Json::Value&, const Json::Value&);
+    bool                    stopRoutine(App&, Json::Value&, const Json::Value&);
+    bool                    shotBubbleRoutine(App&, Json::Value&, const Json::Value&);
+    bool                    enemyDieRoutine(App&, Json::Value&, const Json::Value&);
+    bool                    clearStageRoutine(App&, Json::Value&, const Json::Value&);
+    bool                    clearGameRoutine(App&, Json::Value&, const Json::Value&);
+    bool                    loseGameRoutine(App&, Json::Value&, const Json::Value&);
+    bool                    disconnectedRoutine(App&, Json::Value&, const Json::Value&);
+    bool                    moveRoutine(App&, Json::Value&, const Json::Value&);
+    bool                    defaultRoutine(App&, Json::Value&, const Json::Value&);
+    bool                    jumpRoutine(App&, Json::Value&, const Json::Value&);
+    bool                    aliveRoutine(App&, Json::Value&, const Json::Value&);
+    bool                    shootRoutine(App&, Json::Value&, const Json::Value&);
+    bool                    respawnRoutine(App&, Json::Value&, const Json::Value&);
+    bool                    prisonRoutine(App&, Json::Value&, const Json::Value&);
 
 public:
     static void             onAnimationEvent(animation& animation, const std::string& actionName);

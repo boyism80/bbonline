@@ -55,6 +55,9 @@
     <Filter Include="PBFramework">
       <UniqueIdentifier>{d5d4674d-8605-4f2c-8958-026b1534931f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ASocket">
+      <UniqueIdentifier>{f11c4c54-5c6f-4799-bc6f-f59ac46d1422}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp">
@@ -129,6 +132,9 @@
     <ClCompile Include="..\PBFramework\PBStream.cpp">
       <Filter>PBFramework</Filter>
     </ClCompile>
+    <ClCompile Include="asocket.cpp">
+      <Filter>Source Files\ASocket</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -172,6 +178,9 @@
     </ClInclude>
     <ClInclude Include="config.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="asocket.h">
+      <Filter>Source Files\ASocket</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

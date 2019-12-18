@@ -16,7 +16,7 @@ namespace Scene {
 class BaseScene : public scene
 {
 public:
-    typedef bool (BaseScene::*BBPacketRoutine)(tcp&, Json::Value&, const Json::Value&);
+    typedef bool (BaseScene::*BBPacketRoutine)(App&, Json::Value&, const Json::Value&);
 
 private:
     std::unordered_map<std::string, BBPacketRoutine>        _eventTable;

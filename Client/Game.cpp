@@ -346,7 +346,7 @@ csection::leave("map");
     this->clearBubbles();
 }
 
-bool Game::enterRoomRoutine(tcp& socket, Json::Value& request, const Json::Value& response)
+bool Game::enterRoomRoutine(App& socket, Json::Value& request, const Json::Value& response)
 {
     Json::Value             user = response["user"];
     int                     id = user["id"].asInt();
@@ -366,7 +366,7 @@ csection::leave("characters");
     return false;
 }
 
-bool Game::leaveRoomRoutine(tcp& socket, Json::Value& request, const Json::Value& response)
+bool Game::leaveRoomRoutine(App& socket, Json::Value& request, const Json::Value& response)
 {
     App*                    app = (App*)App::instance();
     if(response["mine"].asBool())
@@ -382,7 +382,7 @@ csection::leave("characters");
     return false;
 }
 
-bool Game::mapRoutine(tcp& socket, Json::Value& request, const Json::Value& response)
+bool Game::mapRoutine(App& socket, Json::Value& request, const Json::Value& response)
 {
 csection::enter("map");
     if (this->_map != NULL)
@@ -393,7 +393,7 @@ csection::leave("map");
     return false;
 }
 
-bool Game::generateRoutine(tcp& socket, Json::Value& request, const Json::Value& response)
+bool Game::generateRoutine(App& socket, Json::Value& request, const Json::Value& response)
 {
     this->_level = response["level"].asInt();
 
@@ -434,7 +434,7 @@ csection::leave("map");
     return false;
 }
 
-bool Game::updateRoutine(tcp& socket, Json::Value& request, const Json::Value& response)
+bool Game::updateRoutine(App& socket, Json::Value& request, const Json::Value& response)
 {
 csection::enter("characters");
     Json::Value             users = response["user"];
@@ -495,7 +495,7 @@ csection::leave("bubbles");
     return false;
 }
 
-bool Game::moveRoutine(tcp& socket, Json::Value& request, const Json::Value& response)
+bool Game::moveRoutine(App& socket, Json::Value& request, const Json::Value& response)
 {
     if(response["success"].asBool() == false)
         return false;
@@ -522,12 +522,12 @@ bool Game::moveRoutine(tcp& socket, Json::Value& request, const Json::Value& res
     return false;
 }
 
-bool Scene::Game::defaultRoutine(tcp & socket, Json::Value& request, const Json::Value& response)
+bool Scene::Game::defaultRoutine(App & socket, Json::Value& request, const Json::Value& response)
 {
     return false;
 }
 
-bool Scene::Game::jumpRoutine(tcp & socket, Json::Value& request, const Json::Value& response)
+bool Scene::Game::jumpRoutine(App & socket, Json::Value& request, const Json::Value& response)
 {
     int                 id = response["id"].asInt();
     const std::string&  type = response["type"].asString();
@@ -557,7 +557,7 @@ bool Scene::Game::jumpRoutine(tcp & socket, Json::Value& request, const Json::Va
     return false;
 }
 
-bool Scene::Game::aliveRoutine(tcp &, Json::Value& request, const Json::Value& response)
+bool Scene::Game::aliveRoutine(App &, Json::Value& request, const Json::Value& response)
 {
     int                 id = response["id"].asInt();
     bool                alive = response["value"].asBool();
@@ -585,7 +585,7 @@ csection::leave("characters");
     return false;
 }
 
-bool Scene::Game::shootRoutine(tcp &, Json::Value& request, const Json::Value& response)
+bool Scene::Game::shootRoutine(App &, Json::Value& request, const Json::Value& response)
 {
     int                 id = response["id"].asInt();
     this->_sound.stop("bubble");
@@ -593,19 +593,19 @@ bool Scene::Game::shootRoutine(tcp &, Json::Value& request, const Json::Value& r
     return false;
 }
 
-bool Scene::Game::respawnRoutine(tcp &, Json::Value& request, const Json::Value& response)
+bool Scene::Game::respawnRoutine(App &, Json::Value& request, const Json::Value& response)
 {
     int                 id = response["id"].asInt();
     this->_characters[id]->change("idle");
     return false;
 }
 
-bool Scene::Game::prisonRoutine(tcp &, Json::Value &, const Json::Value&)
+bool Scene::Game::prisonRoutine(App &, Json::Value &, const Json::Value&)
 {
     return false;
 }
 
-bool Game::stopRoutine(tcp& socket, Json::Value& request, const Json::Value& response)
+bool Game::stopRoutine(App& socket, Json::Value& request, const Json::Value& response)
 {
     int                     id = response["id"].asInt();
     Character&              character = *this->_characters[id];
@@ -614,12 +614,12 @@ bool Game::stopRoutine(tcp& socket, Json::Value& request, const Json::Value& res
     return false;
 }
 
-bool Game::shotBubbleRoutine(tcp& socket, Json::Value& request, const Json::Value& response)
+bool Game::shotBubbleRoutine(App& socket, Json::Value& request, const Json::Value& response)
 {
     return false;
 }
 
-bool Game::enemyDieRoutine(tcp& socket, Json::Value& request, const Json::Value& response)
+bool Game::enemyDieRoutine(App& socket, Json::Value& request, const Json::Value& response)
 {
     auto                i = this->_enemies.find(response["id"].asInt());
     std::string         name = response["name"].asString();
@@ -637,13 +637,13 @@ csection::leave("enemies");
     return false;
 }
 
-bool Game::clearStageRoutine(tcp& socket, Json::Value& request, const Json::Value& response)
+bool Game::clearStageRoutine(App& socket, Json::Value& request, const Json::Value& response)
 {
     request["method"] = "generate";
     return true;
 }
 
-bool Game::clearGameRoutine(tcp& socket, Json::Value& request, const Json::Value& response)
+bool Game::clearGameRoutine(App& socket, Json::Value& request, const Json::Value& response)
 {
     App*                app = (App*)App::instance();
     this->_sound.stop();
@@ -654,7 +654,7 @@ bool Game::clearGameRoutine(tcp& socket, Json::Value& request, const Json::Value
     return false;
 }
 
-bool Game::loseGameRoutine(tcp &, Json::Value &, const Json::Value&)
+bool Game::loseGameRoutine(App &, Json::Value &, const Json::Value&)
 {
     App*                app = (App*)App::instance();
     this->_sound.stop("default bgm");
@@ -665,7 +665,7 @@ bool Game::loseGameRoutine(tcp &, Json::Value &, const Json::Value&)
     return false;
 }
 
-bool Game::disconnectedRoutine(tcp &, Json::Value& request, const Json::Value& response)
+bool Game::disconnectedRoutine(App &, Json::Value& request, const Json::Value& response)
 {
     int                 id = response["id"].asInt();
 

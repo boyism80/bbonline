@@ -17,7 +17,7 @@ class __declspec(dllexport) socket : public virtual object
 private:
 	static WSAData          _wsa;
 
-private:
+protected:
 	SOCKET					_fd;
 	istream					_istream;
 	ostream					_ostream;

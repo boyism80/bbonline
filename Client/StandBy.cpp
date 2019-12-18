@@ -100,7 +100,7 @@ void StandBy::onReceive(App & app, Json::Value & root)
     __super::onReceive(app, root);
 }
 
-bool StandBy::standByStateRoutine(tcp & socket, Json::Value& request, const Json::Value& response)
+bool StandBy::standByStateRoutine(App & socket, Json::Value& request, const Json::Value& response)
 {
 csection::enter("users");
     this->_userList = response["users"];
@@ -110,7 +110,7 @@ csection::leave("users");
     return false;
 }
 
-bool StandBy::readyRoutine(tcp & socket, Json::Value& request, const Json::Value& response)
+bool StandBy::readyRoutine(App & socket, Json::Value& request, const Json::Value& response)
 {
     App*                app = (App*)App::instance();
 
@@ -135,7 +135,7 @@ csection::leave("users");
     return false;
 }
 
-bool Scene::StandBy::leaveRoomRoutine(tcp & socket, Json::Value& request, const Json::Value& response)
+bool Scene::StandBy::leaveRoomRoutine(App & socket, Json::Value& request, const Json::Value& response)
 {
     if(response["success"].asBool() == false)
     {
@@ -150,7 +150,7 @@ bool Scene::StandBy::leaveRoomRoutine(tcp & socket, Json::Value& request, const 
     return false;
 }
 
-bool StandBy::disconnectedRoutine(tcp & socket, Json::Value& request, const Json::Value& response)
+bool StandBy::disconnectedRoutine(App & socket, Json::Value& request, const Json::Value& response)
 {
     App*                app = (App*)App::instance();
 

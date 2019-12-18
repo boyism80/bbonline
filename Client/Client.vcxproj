@@ -160,6 +160,7 @@
     <ClCompile Include="..\PBFramework\PBThread.cpp" />
     <ClCompile Include="..\PBFramework\PBWindow.cpp" />
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="asocket.cpp" />
     <ClCompile Include="Base.cpp" />
     <ClCompile Include="Bubble.cpp" />
     <ClCompile Include="Character.cpp" />
@@ -174,6 +175,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h" />
+    <ClInclude Include="asocket.h" />
     <ClInclude Include="Base.h" />
     <ClInclude Include="Bubble.h" />
     <ClInclude Include="Character.h" />

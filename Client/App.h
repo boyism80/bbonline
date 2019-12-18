@@ -9,9 +9,9 @@
 //#pragma comment(lib, "PBFramework/lib/x86/PBFramework.lib")
 #endif // _WIN64
 
+#include "asocket.h"
 #include "json/json.h"
 #include "PBApplication.h"
-#include "PBSocket.h"
 #include "Robby.h"
 #include "Game.h"
 #include "StandBy.h"
@@ -22,7 +22,7 @@
 using namespace PB;
 using namespace PB::Windows;
 
-class App : public application, public client
+class App : public application, public ASocket
 {
 private:
     Character*          _character;
@@ -45,9 +45,9 @@ public:
     void                onDestroy();
 
 public:
-    void                onConnected(tcp& sock);
-    bool                onReceive(tcp& sock);
-    void                onDisconnect(tcp& sock);
+    void                onConnected(App& sock);
+    bool                onReceive(App& sock);
+    void                onDisconnect(App& sock);
 };
 
 #endif // !__GAMECLIENT_H__

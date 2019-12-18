@@ -182,7 +182,7 @@ csection::enter("rooms");
 csection::leave("rooms");
 }
 
-bool Robby::roomListRoutine(tcp & socket, Json::Value& request, const Json::Value& response)
+bool Robby::roomListRoutine(App & socket, Json::Value& request, const Json::Value& response)
 {
 csection::enter("rooms");
     this->_rooms.clear();
@@ -195,7 +195,7 @@ csection::leave("rooms");
     return false;
 }
 
-bool Robby::createRoomRoutine(tcp & socket, Json::Value& request, const Json::Value& response)
+bool Robby::createRoomRoutine(App & socket, Json::Value& request, const Json::Value& response)
 {
     App*                app = (App*)App::instance();
 
@@ -220,7 +220,7 @@ csection::leave("rooms");
     return false;
 }
 
-bool Robby::enterRoomRoutine(tcp & socket, Json::Value& request, const Json::Value& response)
+bool Robby::enterRoomRoutine(App & socket, Json::Value& request, const Json::Value& response)
 {
     App*                app = (App*)App::instance();
 
@@ -234,7 +234,7 @@ bool Robby::enterRoomRoutine(tcp & socket, Json::Value& request, const Json::Val
     return false;
 }
 
-bool Scene::Robby::leaveRoomRoutine(tcp &, Json::Value& request, const Json::Value& response)
+bool Scene::Robby::leaveRoomRoutine(App &, Json::Value& request, const Json::Value& response)
 {
     App*                app = (App*)App::instance();
     if (response["success"].asBool() == false)

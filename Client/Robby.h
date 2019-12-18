@@ -37,10 +37,10 @@ public:
     void                onDestroy();
 
 public:
-    bool                roomListRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                createRoomRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                enterRoomRoutine(tcp&, Json::Value&, const Json::Value&);
-    bool                leaveRoomRoutine(tcp&, Json::Value&, const Json::Value&);
+    bool                roomListRoutine(App&, Json::Value&, const Json::Value&);
+    bool                createRoomRoutine(App&, Json::Value&, const Json::Value&);
+    bool                enterRoomRoutine(App&, Json::Value&, const Json::Value&);
+    bool                leaveRoomRoutine(App&, Json::Value&, const Json::Value&);
 };
 
 }
