@@ -167,6 +167,7 @@
   <ItemGroup>
     <ClInclude Include="PBAnimation.h" />
     <ClInclude Include="PBApplication.h" />
+    <ClInclude Include="PBSocket.h" />
     <ClInclude Include="PBStream.h" />
     <ClInclude Include="PBDeviceContext.h" />
     <ClInclude Include="PBLeak.h" />
@@ -174,7 +175,6 @@
     <ClInclude Include="PBPoint.h" />
     <ClInclude Include="PBRect.h" />
     <ClInclude Include="PBScene.h" />
-    <ClInclude Include="PBSocket.h" />
     <ClInclude Include="PBSound.h" />
     <ClInclude Include="PBSprite.h" />
     <ClInclude Include="PBThread.h" />

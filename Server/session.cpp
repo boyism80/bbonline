@@ -1,7 +1,7 @@
-#include "Client.h"
+#include "session.h"
 #include "Room.h"
 
-Client::Client(SOCKET fd, StateChangeRoutine callback) : 
+session::session(SOCKET fd, StateChangeRoutine callback) : 
 	base_session(fd), 
     Character(this->id(), callback),
     _order(-1)
@@ -9,41 +9,41 @@ Client::Client(SOCKET fd, StateChangeRoutine callback) :
     this->_isReady              = false;
 }
 
-Client::~Client()
+session::~session()
 {
 }
 
-int Client::id() const
+int session::id() const
 {
     return static_cast<SOCKET>(*this);
 }
 
-bool Client::ready() const
+bool session::ready() const
 {
     return this->_isReady;
 }
 
-void Client::ready(bool state)
+void session::ready(bool state)
 {
     this->_isReady = state;
 }
 
-int Client::order() const
+int session::order() const
 {
     return this->_order;
 }
 
-void Client::order(int order)
+void session::order(int order)
 {
     this->_order = order;
 }
 
-bool Client::enter(Room * room)
+bool session::enter(Room * room)
 {
     return room->enter(this);
 }
 
-bool Client::leave()
+bool session::leave()
 {
     Room* room = this->room();
     if(room == NULL)
@@ -53,7 +53,7 @@ bool Client::leave()
     return true;
 }
 
-bool Client::send(const Json::Value & json)
+bool session::send(const Json::Value & json)
 {
 	Json::FastWriter	writer;
 	std::string			str = writer.write(json);
@@ -65,7 +65,7 @@ bool Client::send(const Json::Value & json)
 	return true;
 }
 
-Json::Value& Client::toJson(Json::Value & json)
+Json::Value& session::toJson(Json::Value & json)
 {
     __super::toJson(json);
     json["id"] = this->id();

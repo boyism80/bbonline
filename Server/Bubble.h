@@ -2,7 +2,6 @@
 #define __BUBBLE_H__
 
 #include "Life.h"
-#include "Enemy.h"
 
 //
 // Bubble
@@ -10,6 +9,7 @@
 //
 
 class Character;
+class Enemy;
 
 class Bubble : public Life
 {

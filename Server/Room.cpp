@@ -1,14 +1,13 @@
 #include "Room.h"
-#include "Life.h"
 
-Room::Room(const std::string& name, Client* priest, int capacity) : _name(name), _priest(priest), _capacity(capacity), _level(-1)
+Room::Room(const std::string& name, ::session* priest, int capacity) : _name(name), _priest(priest), _capacity(capacity), _level(-1)
 {
     static int          ROOM_INDEX = 0;     // 방이 생성될때마다 부여될 id
 
     this->_index        = ROOM_INDEX++;
     this->_state        = State::WAIT;
 
-    memset(&this->_clients, NULL, sizeof(this->_clients));
+    memset(&this->_sessions, NULL, sizeof(this->_sessions));
 }
 
 Room::~Room()
@@ -64,7 +63,7 @@ const std::string & Room::name() const
 // Return
 //  방장을 리턴
 //
-Client * Room::priest() const
+session * Room::priest() const
 {
     return this->_priest;
 }
@@ -74,10 +73,10 @@ bool Room::priest(int index)
     if(index < 0 || index > this->_capacity)
         return false;
 
-    if(this->_clients[index] == NULL)
+    if(this->_sessions[index] == NULL)
         return false;
 
-    this->_priest = this->_clients[index];
+    this->_priest = this->_sessions[index];
     return true;
 }
 
@@ -85,13 +84,13 @@ void Room::autoResetPriest()
 {
     for(int i = 0; i < this->_capacity; i++)
     {
-        if(this->_clients[i] == NULL)
+        if(this->_sessions[i] == NULL)
             continue;
 
-        if(this->_clients[i] == this->_priest)
+        if(this->_sessions[i] == this->_priest)
             continue;
 
-        this->_priest = this->_clients[i];
+        this->_priest = this->_sessions[i];
         break;
     }
 }
@@ -141,17 +140,17 @@ void Room::state(Room::State value)
 // Return
 //  게임방에 존재하는 클라이언트 정보를 리턴
 //
-Client** Room::clients()
+session** Room::sessions()
 {
-    return this->_clients;
+    return this->_sessions;
 }
 
-Client* Room::client(int index)
+session* Room::session(int index)
 {
     if(index < 0 || index > MAX_CLIENT_COUNT_IN_ROOM - 1)
         return NULL;
 
-    return this->_clients[index];
+    return this->_sessions[index];
 }
 
 int Room::clientCount() const
@@ -159,7 +158,7 @@ int Room::clientCount() const
     int count = 0;
     for(int i = 0; i < this->_capacity; i++)
     {
-        if(this->_clients[i] == NULL)
+        if(this->_sessions[i] == NULL)
             continue;
 
         count++;
@@ -188,7 +187,7 @@ std::vector<Bubble*>& Room::bubbles()
     return this->_bubbles;
 }
 
-bool Room::enter(Client * client)
+bool Room::enter(::session * session)
 {
     if(this->isFull())
         return false;
@@ -196,16 +195,16 @@ bool Room::enter(Client * client)
     if(this->_state != WAIT)
         return false;
 
-    if(client->room(this) == false)
+    if(session->room(this) == false)
         return false;
 
     for(int i = 0; i < this->_capacity; i++)
     {
-        if(this->_clients[i] != NULL)
+        if(this->_sessions[i] != NULL)
             continue;
 
-        this->_clients[i] = client;
-        this->_clients[i]->order(i);
+        this->_sessions[i] = session;
+        this->_sessions[i]->order(i);
         break;
     }
     return true;
@@ -235,26 +234,26 @@ csection::leave("bubbles");
     return true;
 }
 
-bool Room::leave(Client * client)
+bool Room::leave(::session * session)
 {
     bool result = false;
 csection::enter("characters");
     try
     {
-        if(client->entered() == false)
+        if(session->entered() == false)
             throw false;
 
-        int order = client->order();
+        int order = session->order();
         if(order == -1)
             throw false;
 
-        if(this->_priest == this->_clients[order])
+        if(this->_priest == this->_sessions[order])
             this->autoResetPriest();
 
-        this->_clients[order]->room(NULL);
-        this->_clients[order]->order(-1);
-        this->_clients[order] = NULL;
-        client->ready(false);
+        this->_sessions[order]->room(NULL);
+        this->_sessions[order]->order(-1);
+        this->_sessions[order] = NULL;
+        session->ready(false);
         result = true;
     }
     catch(bool e)
@@ -347,10 +346,10 @@ void Room::init()
 {
     for(int i = 0; i < this->_capacity; i++)
     {
-        if(this->_clients[i] == NULL)
+        if(this->_sessions[i] == NULL)
             continue;
 
-        Character&              character = *this->_clients[i];
+        Character&              character = *this->_sessions[i];
         character.init();
     }
 }
@@ -370,10 +369,10 @@ bool Room::nextLevel()
     this->_bubbles.clear();
     for (int i = 0; i < this->_capacity; i++)
     {
-        if (this->_clients[i] == NULL)
+        if (this->_sessions[i] == NULL)
             continue;
 
-        Character&              character = *this->_clients[i];
+        Character&              character = *this->_sessions[i];
         character.stop();
     }
 
@@ -406,10 +405,10 @@ bool Room::isLose() const
 {
     for (int i = 0; i < this->_capacity; i++)
     {
-        if (this->_clients[i] == NULL)
+        if (this->_sessions[i] == NULL)
             continue;
 
-        Character&              character = *this->_clients[i];
+        Character&              character = *this->_sessions[i];
         if(character.respawnable())
             return false;
     }
@@ -426,7 +425,7 @@ bool Room::isFull() const
 {
     for(int i = 0; i < this->_capacity; i++)
     {
-        if(this->_clients[i] == NULL)
+        if(this->_sessions[i] == NULL)
             return false;
     }
 
@@ -437,7 +436,7 @@ bool Room::isEmpty() const
 {
     for(int i = 0; i < this->_capacity; i++)
     {
-        if(this->_clients[i] != NULL)
+        if(this->_sessions[i] != NULL)
             return false;
     }
 
@@ -449,10 +448,10 @@ bool Room::respawn(int index, point point)
     if(index < 0 || index > this->_capacity - 1)
         return false;
 
-    if(this->_clients[index] == NULL)
+    if(this->_sessions[index] == NULL)
         return false;
 
-    Character& character = *this->_clients[index];
+    Character& character = *this->_sessions[index];
     character.position(point);
     character.respawnPoint(point);
     return true;
@@ -462,12 +461,12 @@ void Room::destroy()
 {
     for (int i = 0; i < this->_capacity; i++)
     {
-        if(this->_clients[i] == NULL)
+        if(this->_sessions[i] == NULL)
             continue;
 
-        Room* room = this->_clients[i]->room();
-        room->leave(this->_clients[i]);
+        Room* room = this->_sessions[i]->room();
+        room->leave(this->_sessions[i]);
     }
 
-    memset(&this->_clients, 0, sizeof(this->_clients));
+    memset(&this->_sessions, 0, sizeof(this->_sessions));
 }

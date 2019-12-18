@@ -170,7 +170,7 @@ csection::csection()
 
 csection::~csection()
 {
-    for(std::unordered_map<std::string, csection_item*>::iterator i = this->_criticalSectionTable.begin(); i != this->_criticalSectionTable.end(); i++)
+    for(auto i = this->_criticalSectionTable.begin(); i != this->_criticalSectionTable.end(); i++)
         delete i->second;
 }
 
@@ -229,7 +229,7 @@ bool csection::leave(const char* format, ...)
     char*                   id          = new char[_vscprintf(format, args) + 1];
     vsprintf(id, format, args);
 
-    std::unordered_map<std::string, csection_item*>::iterator i = csection::_instance->_criticalSectionTable.find(id);
+    std::map<std::string, csection_item*>::iterator i = csection::_instance->_criticalSectionTable.find(id);
     if (i == csection::_instance->_criticalSectionTable.end())
         return false;
 

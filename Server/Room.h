@@ -3,13 +3,15 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
+#include "session.h"
 #include "Config.h"
-#include <vector>
-#include "Client.h"
 #include "Enemy.h"
 #include "Bubble.h"
+#include "PBThread.h"
 
 #define MAX_LEVEL   3
+
+class session;
 
 class Room
 {
@@ -23,36 +25,36 @@ private:
     int                         _index;
     int                         _capacity;
     std::string                 _name;
-    Client*                     _clients[MAX_CLIENT_COUNT_IN_ROOM];
+    session*                    _sessions[MAX_CLIENT_COUNT_IN_ROOM];
     std::vector<Enemy*>         _enemies;
     std::vector<Bubble*>        _bubbles;
-    Client*                     _priest;
+    session*                    _priest;
     State                       _state;
     int                         _level;
 
 public:
-    Room(const std::string& name, Client* priest, int capacity = 2);
+    Room(const std::string& name, session* priest, int capacity = 2);
     ~Room();
 
 public:
-    bool                        enter(Client* client);
+    bool                        enter(session* session);
     bool                        enter(Enemy* enemy);
     bool                        enter(Bubble* bubble);
-    bool                        leave(Client* client);
+    bool                        leave(session* session);
     bool                        leave(Enemy* enemy);
     bool                        leave(Bubble* enemy);
 
 public:
     int                         id() const;
     const std::string&          name() const;
-    Client*                     priest() const;
+    session*                    priest() const;
     bool                        priest(int index);
     void                        autoResetPriest();
     int                         capacity() const;
     State                       state() const;
     void                        state(Room::State value);
-    Client**                    clients();
-    Client*                     client(int index);
+    session**                   sessions();
+    session*                    session(int index);
     int                         clientCount() const;
     std::vector<Enemy*>&        enemies();
     std::vector<Bubble*>&       bubbles();

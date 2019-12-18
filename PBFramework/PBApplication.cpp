@@ -49,7 +49,7 @@ application::application(int fps, float scale) : _fps(fps), _scale(scale)
 
 application::~application()
 {
-    for(std::unordered_map<std::string, scene*>::iterator i = this->_sceneMap.begin(); i != this->_sceneMap.end(); i++)
+    for(auto i = this->_sceneMap.begin(); i != this->_sceneMap.end(); i++)
         delete i->second;
 }
 
@@ -113,7 +113,7 @@ scene * application::currentScene() const
 //
 bool application::trans(const std::string& sceneName)
 {
-    std::unordered_map<std::string, scene*>::const_iterator i =  this->_sceneMap.find(sceneName);
+    auto i =  this->_sceneMap.find(sceneName);
     if(i == this->_sceneMap.end())
         return false;
 

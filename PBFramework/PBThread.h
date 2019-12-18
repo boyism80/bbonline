@@ -4,7 +4,8 @@
 #include <Windows.h>
 #include "PBObject.h"
 #include <exception>
-#include <unordered_map>
+#include <string>
+#include <map>
 
 namespace PB {
 
@@ -35,7 +36,7 @@ public:
 class __declspec(dllexport) csection : public virtual object
 {
 public:
-    typedef std::unordered_map<std::string, csection_item*> csection_map;
+    typedef std::map<std::string, csection_item*> csection_map;
 
 private:
     static csection*        _instance;

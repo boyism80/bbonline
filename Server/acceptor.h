@@ -2,14 +2,15 @@
 #define	__ACCEPTOR_H__
 
 #include "PBSocket.h"
+#include <thread>
 
 using namespace PB;
 
 class base_session : public socket
 {
 public:
-	base_session(SOCKET fd) : socket(fd) {};
-	virtual ~base_session() {};
+	base_session(SOCKET fd);
+	virtual ~base_session();
 };
 
 template <class T>

@@ -33,9 +33,6 @@
     <ClCompile Include="PBScene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PBSocket.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PBSprite.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -49,6 +46,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PBStream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PBSocket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -80,9 +80,6 @@
     <ClInclude Include="PBThread.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="PBSocket.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="PBSound.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -93,6 +90,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="PBStream.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PBSocket.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

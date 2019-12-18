@@ -10,9 +10,6 @@
     <Filter Include="Source Files\Character">
       <UniqueIdentifier>{1702a397-4483-485f-b2d8-1777993baf08}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Client">
-      <UniqueIdentifier>{de80af40-1e5b-4267-a591-a53943f8dea1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Enemy">
       <UniqueIdentifier>{233c8975-3e7a-409c-abe0-81aad47941ee}</UniqueIdentifier>
     </Filter>
@@ -40,37 +37,13 @@
     <Filter Include="Source Files\Acceptor">
       <UniqueIdentifier>{7ec80e4b-f253-491c-8894-127c477c0fee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\session">
+      <UniqueIdentifier>{de80af40-1e5b-4267-a591-a53943f8dea1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Bubble.cpp">
-      <Filter>Source Files\Bubble</Filter>
-    </ClCompile>
-    <ClCompile Include="Character.cpp">
-      <Filter>Source Files\Character</Filter>
-    </ClCompile>
-    <ClCompile Include="Client.cpp">
-      <Filter>Source Files\Client</Filter>
-    </ClCompile>
-    <ClCompile Include="Enemy.cpp">
-      <Filter>Source Files\Enemy</Filter>
-    </ClCompile>
-    <ClCompile Include="Life.cpp">
-      <Filter>Source Files\Life</Filter>
-    </ClCompile>
-    <ClCompile Include="Map.cpp">
-      <Filter>Source Files\Map</Filter>
-    </ClCompile>
-    <ClCompile Include="Room.cpp">
-      <Filter>Source Files\Room</Filter>
-    </ClCompile>
-    <ClCompile Include="App.cpp">
-      <Filter>Source Files\App</Filter>
-    </ClCompile>
-    <ClCompile Include="Object.cpp">
-      <Filter>Source Files\Object</Filter>
     </ClCompile>
     <ClCompile Include="..\PBFramework\PBAnimation.cpp">
       <Filter>PBFramework</Filter>
@@ -90,9 +63,6 @@
     <ClCompile Include="..\PBFramework\PBScene.cpp">
       <Filter>PBFramework</Filter>
     </ClCompile>
-    <ClCompile Include="..\PBFramework\PBSocket.cpp">
-      <Filter>PBFramework</Filter>
-    </ClCompile>
     <ClCompile Include="..\PBFramework\PBSound.cpp">
       <Filter>PBFramework</Filter>
     </ClCompile>
@@ -108,35 +78,38 @@
     <ClCompile Include="..\PBFramework\PBStream.cpp">
       <Filter>PBFramework</Filter>
     </ClCompile>
+    <ClCompile Include="..\PBFramework\PBSocket.cpp">
+      <Filter>PBFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="acceptor.cpp">
+      <Filter>Source Files\Acceptor</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Source Files\Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Life.cpp">
+      <Filter>Source Files\Life</Filter>
+    </ClCompile>
+    <ClCompile Include="Bubble.cpp">
+      <Filter>Source Files\Bubble</Filter>
+    </ClCompile>
+    <ClCompile Include="Character.cpp">
+      <Filter>Source Files\Character</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>Source Files\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="Room.cpp">
+      <Filter>Source Files\Room</Filter>
+    </ClCompile>
+    <ClCompile Include="session.cpp">
+      <Filter>Source Files\session</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>Source Files\Map</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Bubble.h">
-      <Filter>Source Files\Bubble</Filter>
-    </ClInclude>
-    <ClInclude Include="Character.h">
-      <Filter>Source Files\Character</Filter>
-    </ClInclude>
-    <ClInclude Include="Client.h">
-      <Filter>Source Files\Client</Filter>
-    </ClInclude>
-    <ClInclude Include="Enemy.h">
-      <Filter>Source Files\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="Life.h">
-      <Filter>Source Files\Life</Filter>
-    </ClInclude>
-    <ClInclude Include="Map.h">
-      <Filter>Source Files\Map</Filter>
-    </ClInclude>
-    <ClInclude Include="Room.h">
-      <Filter>Source Files\Room</Filter>
-    </ClInclude>
-    <ClInclude Include="App.h">
-      <Filter>Source Files\App</Filter>
-    </ClInclude>
-    <ClInclude Include="Object.h">
-      <Filter>Source Files\Object</Filter>
-    </ClInclude>
     <ClInclude Include="Config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -145,6 +118,30 @@
     </ClInclude>
     <ClInclude Include="acceptor.hpp">
       <Filter>Source Files\Acceptor</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Source Files\Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Life.h">
+      <Filter>Source Files\Life</Filter>
+    </ClInclude>
+    <ClInclude Include="Bubble.h">
+      <Filter>Source Files\Bubble</Filter>
+    </ClInclude>
+    <ClInclude Include="Character.h">
+      <Filter>Source Files\Character</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>Source Files\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="Room.h">
+      <Filter>Source Files\Room</Filter>
+    </ClInclude>
+    <ClInclude Include="session.h">
+      <Filter>Source Files\session</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>Source Files\Map</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

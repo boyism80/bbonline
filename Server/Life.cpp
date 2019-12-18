@@ -1,5 +1,5 @@
 #include "Life.h"
-#include "Room.h"
+//#include "Room.h"
 
 static const float GRAVITY = 350.0f;        // 중력 값
 static const float GRAVITY_MAX = 120.0f;    // 중력 최대 값

@@ -1,6 +1,7 @@
 #include "Bubble.h"
 #include "Character.h"
-#include "Room.h"
+//#include "Room.h"
+#include "Enemy.h"
 
 Bubble::Bubble(Character* owner, const point_f& position, float range, bool isRight) : Life(-1, position, 20, 20, point_f(200.0f * (isRight ? 1 : -1), 0.0f), Life::Direction::Right, false), _createPoint(position)
 {

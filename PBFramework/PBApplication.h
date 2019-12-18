@@ -6,7 +6,6 @@
 #include <string>
 #include "PBScene.h"
 #include "PBDeviceContext.h"
-#include "PBSocket.h"
 #include "PBRect.h"
 #include <crtdbg.h>
 

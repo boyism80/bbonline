@@ -118,7 +118,7 @@ sprite::sprite(const wchar_t * filename)
 
 sprite::~sprite()
 {
-    for(std::unordered_map<std::string, image*>::iterator i = this->_images.begin(); i != this->_images.end(); i++)
+    for(auto i = this->_images.begin(); i != this->_images.end(); i++)
         delete i->second;
     this->_images.clear();
 }
@@ -190,7 +190,7 @@ bool sprite::load(const wchar_t * filename)
 // 
 image * sprite::get(const std::string & id) const
 {
-    std::unordered_map<std::string, image*>::const_iterator i = this->_images.find(id);
+    auto i = this->_images.find(id);
     if(i == this->_images.end())
         return NULL;
 

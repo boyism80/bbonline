@@ -1,12 +1,13 @@
 #ifndef __FB_STREAM_H__
 #define	__FB_STREAM_H__
 
+#include "PBObject.h"
 #include <vector>
 #include <algorithm>
 
 namespace PB {
 
-class stream : public std::vector<uint8_t>
+class stream : public std::vector<uint8_t>, public virtual object
 {
 public:
 	enum endian { LITTLE = 0, BIG = 1};
