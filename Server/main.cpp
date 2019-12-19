@@ -9,8 +9,8 @@
 //#pragma comment(lib, "PBFramework/lib/x86/PBFramework.lib")
 #endif // _WIN64
 
-#include "PBThread.h"
 #include "App.h"
+#include "PBThread.h"
 #include <stdio.h>
 
 

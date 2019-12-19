@@ -153,7 +153,7 @@ session* Room::session(int index)
     return this->_sessions[index];
 }
 
-int Room::clientCount() const
+int Room::sessionCount() const
 {
     int count = 0;
     for(int i = 0; i < this->_capacity; i++)

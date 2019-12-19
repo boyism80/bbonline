@@ -1,5 +1,6 @@
 #include "session.h"
 #include "Room.h"
+#include "PBThread.h"
 
 session::session(SOCKET fd, StateChangeRoutine callback) : 
 	base_session(fd), 
@@ -58,9 +59,11 @@ bool session::send(const Json::Value & json)
 	Json::FastWriter	writer;
 	std::string			str = writer.write(json);
 
+csection::enter("session::send");
 	ostream&			ostream = this->out_stream();
 	ostream.write_u32(str.size())
 		.write(str.c_str(), str.size());
+csection::leave("session::send");
 
 	return true;
 }

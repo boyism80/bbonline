@@ -24,6 +24,9 @@ typedef struct			// 소켓의 버퍼 정보를 구조체화
 class ASocket : public PB::socket
 {
 private:
+	HANDLE					_completionPort;
+
+private:
 	std::thread*			_completionReadThread;
 	std::thread*			_completionWriteThread;
 
@@ -35,9 +38,11 @@ public:
 	bool					connect(const std::string& ip, uint16_t port);
 
 public:
-public:
 	void					completionReadThreadRoutine(HANDLE completionPort);
 	void					completionWriteThreadRoutine(HANDLE completionPort);
+
+public:
+	virtual bool			handle_receive() = 0;
 };
 
 #endif // !__ASOCKET_H__
