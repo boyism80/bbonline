@@ -10,7 +10,7 @@
 #endif // _WIN64
 
 #include "PBThread.h"
-//#include "App.h"
+#include "App.h"
 #include <stdio.h>
 
 
@@ -19,27 +19,27 @@ int main(int argc, const char** argv)
     //new char;
     //_CrtSetBreakAlloc(1134);
 
-    //printf("port : %d\n", PORT);
+    printf("port : %d\n", PORT);
 
-    //socket::init();
-    //csection::init();
+    socket::init();
+    csection::init();
 
-    //App* server = App::instance();
-    //server->execute(true);
+    App* server = App::instance();
+    server->execute(true);
 
-    //while(true)
-    //{
-    //    char cmd;
-    //    scanf("%c", &cmd);
-    //    if(cmd == 'q')
-    //        break;
-    //}
+    while(true)
+    {
+        char cmd;
+        scanf("%c", &cmd);
+        if(cmd == 'q')
+            break;
+    }
 
-    //server->exit();
-    //server->release();
-    //
+    server->exit();
+    server->release();
+    
 
-    //socket::release();
-    //csection::release();
+    socket::release();
+    csection::release();
     return 0;
 }

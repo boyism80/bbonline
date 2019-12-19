@@ -23,7 +23,7 @@ private:
     static application* _instance;
 
 public:
-    typedef std::unordered_map<std::string, scene*> scene_map;
+    typedef std::map<std::string, scene*> scene_map;
 
 private:
     int                     _fps;
