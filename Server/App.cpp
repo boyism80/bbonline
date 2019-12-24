@@ -1449,6 +1449,7 @@ void App::handle_update(Room* room, float elapsedTime)
 
 bool App::handle_connected(::session& socket) 
 {
+	socket.callback(App::stateChangeRoutine);
     return true;
 }
 
