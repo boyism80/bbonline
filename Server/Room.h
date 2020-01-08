@@ -55,7 +55,7 @@ public:
     void                        state(Room::State value);
     session**                   sessions();
     session*                    session(int index);
-    int                         clientCount() const;
+    int                         sessionCount() const;
     std::vector<Enemy*>&        enemies();
     std::vector<Bubble*>&       bubbles();
     int                         level() const;

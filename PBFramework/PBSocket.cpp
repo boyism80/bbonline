@@ -10,8 +10,8 @@ PB::socket::socket(SOCKET socket) : _fd(INVALID_SOCKET)
 	u_long opt = 1;
 	::ioctlsocket(this->_fd, FIONBIO, &opt);
 
-	this->_istream.reserve(0x1000);
-	this->_ostream.reserve(0x1000);
+	this->_istream.reserve(0x2000);
+	this->_ostream.reserve(0x2000);
 }
 
 PB::socket::~socket()

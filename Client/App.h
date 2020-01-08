@@ -46,7 +46,7 @@ public:
 
 public:
     void                onConnected(App& sock);
-    bool                onReceive(App& sock);
+    bool                handle_receive();
     void                onDisconnect(App& sock);
 };
 

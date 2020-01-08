@@ -1,4 +1,5 @@
 #include "acceptor.h"
+#include "PBThread.h"
 
 template <typename T>
 base_acceptor<T>::base_acceptor(uint16_t port) : PB::socket(::socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)),
@@ -27,7 +28,7 @@ bool base_acceptor<T>::do_session()
 {
 	struct timeval timeout;
 	timeout.tv_sec  = 0;
-	timeout.tv_usec = 500000;
+	timeout.tv_usec = 50000;
 
 	fd_set& reads = this->_sockets;
 	fd_set	copy  = reads;

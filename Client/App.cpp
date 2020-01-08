@@ -99,8 +99,8 @@ App::App(const char* ip, short port) :
 {
     try
     {
-        //if (this->connect() == false)
-        //    throw std::exception("연결할 수 없습니다.");
+        if (this->connect(ip, port) == false)
+            throw std::exception("연결할 수 없습니다.");
     }
     catch(std::exception& e)
     {
@@ -190,28 +190,14 @@ void App::onConnected(App & sock)
 	this->send(root);
 }
 
-//
-// onReceive
-//  서버로부터 데이터를 받았을 때 호출되는 이벤트 핸들러
-//
-// Parameters
-//  sock        소켓
-//  bytes       받은 데이터
-//
-// Return
-//  없음
-//
-bool App::onReceive(App & sock)
+bool App::handle_receive()
 {
-    Json::Value             root;
+	Json::Value             root;
 	bool					success = true;
 	uint8_t*				buffer = NULL;
 	uint8_t*				binary  = NULL;
 
-	if(this->recv() == false)
-		return success;
-
-    while(true)
+	while(true)
 	{
 		try
 		{
@@ -222,7 +208,10 @@ bool App::onReceive(App & sock)
 			if(size > this->_istream.capacity())
 				throw std::exception();
 
-			if(buffer == NULL)
+			if(this->_istream.readable_size() < size)
+				break;
+
+			if(buffer)
 				delete[] buffer;
 			buffer = new uint8_t[size];
 			this->_istream.read(buffer, size);
@@ -244,7 +233,7 @@ bool App::onReceive(App & sock)
 				if(this->_istream.readable_size() < binary_size)
 					break;
 
-				if(binary != NULL)
+				if(binary)
 					delete[] binary;
 				binary = new uint8_t[binary_size];
 				this->_istream.read(binary, binary_size);
@@ -271,14 +260,27 @@ bool App::onReceive(App & sock)
 
 	this->_istream.reset();
 
-	if(buffer != NULL)
+	if(buffer)
 		delete[] buffer;
 
-	if(binary != NULL)
+	if(binary)
 		delete[] binary;
 
 	return success;
 }
+
+//
+// onReceive
+//  서버로부터 데이터를 받았을 때 호출되는 이벤트 핸들러
+//
+// Parameters
+//  sock        소켓
+//  bytes       받은 데이터
+//
+// Return
+//  없음
+//
+
 
 //
 // onDisconnect

@@ -492,6 +492,8 @@ csection::enter("bubbles");
     }
 csection::leave("bubbles");
 
+	static uint32_t sequence = 0;
+	std::cout << "updated : " << std::to_string(sequence++) << std::endl;
     return false;
 }
 

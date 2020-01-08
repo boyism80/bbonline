@@ -78,12 +78,12 @@ void BaseScene::onReceive(App & app, Json::Value & response)
     }
 
 	
-	Json::FastWriter writer;
-	std::string jsons = writer.write(response);
+	//Json::FastWriter writer;
+	//std::string jsons = writer.write(request);
 
-	ostream& ostream = app.out_stream();
-	ostream.write_u32(jsons.size())
-		.write(jsons.data(), jsons.size());
+	//ostream& ostream = app.out_stream();
+	//ostream.write_u32(jsons.size())
+	//	.write(jsons.data(), jsons.size());
 }
 
 void BaseScene::onDestroy()
